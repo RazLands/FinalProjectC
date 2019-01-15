@@ -15,7 +15,7 @@
 * When you submit the program make sure this path match to: "c:\\temp\\log.txt"
 ***/
 
-void readAccess(char *path, list *lst); // Node *head)
+void readAccess(char *path, Node *head) //list *lst); // 
 /***
 * Handle function: get's the path of the access file, and print all users information.
 * You may change it according to your needs.
