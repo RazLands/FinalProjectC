@@ -15,7 +15,7 @@
 * When you submit the program make sure this path match to: "c:\\temp\\log.txt"
 ***/
 
-void readAccess(char *path, Node *head) //list *lst); // 
+void readAccess(char *path, list *lst); //Node *head); // 
 /***
 * Handle function: get's the path of the access file, and print all users information.
 * You may change it according to your needs.
@@ -27,7 +27,7 @@ void getDateTime(int *day, int *month, int *year, int *hours, int *mins);
 ***/
 
 
-void readAccess(char *path, Node *head) //list *lst) // 
+void readAccess(char *path, list *lst) // Node *head) // 
 {
 	FILE *fp;
 	char temp[70], name[21], code[9], status[2], date_s[11], date_e[11], time_s[6], time_e[6];
@@ -52,24 +52,24 @@ void readAccess(char *path, Node *head) //list *lst) //
 		strcpy(d.time_s, time_s);
 		strcpy(d.time_e, time_e);
 	
-		printf(
-			"First Print:\nname: %s, code: %s, status: %s, date_s: %s, date_e: %s, time_s: %s, time_e: %s\n", 
-			d.name,
-			d.code,
-			d.status,
-			d.date_s,
-			d.date_e,
-			d.time_s,
-			d.time_e		
-		);
+		//printf(
+		//	"First Print:\nname: %s, code: %s, status: %s, date_s: %s, date_e: %s, time_s: %s, time_e: %s\n", 
+		//	d.name,
+		//	d.code,
+		//	d.status,
+		//	d.date_s,
+		//	d.date_e,
+		//	d.time_s,
+		//	d.time_e		
+		//);
 
-		insert_bottom(d, &head);
-		//insertLast(lst, d);
+		//insert_bottom(d, &head);
+		insertLast(lst, d);
 		
 	}
-
+	print(lst);
 	fclose(fp);
-	return head;
+	return lst;
 	//return lst;
 }
 
@@ -109,18 +109,19 @@ node *addUser(node *user) {
 
 void main() {
 
-	Node *head = (Node *)malloc(sizeof(Node));
-	head = NULL;
-	//list *lst = (list *)malloc(sizeof(list));
+	//Node *head = (Node *)malloc(sizeof(Node));
+	//head = NULL;
+	list *lst = (list *)malloc(sizeof(list));
+	init_list(lst);
 	//lst->head = NULL;
 	//lst->tail = NULL;
 	int option;
 	char * temp;
 
-	readAccess(ACCESS_PATH, head);
-	//readAccess(ACCESS_PATH, lst);
+	//readAccess(ACCESS_PATH, head);
+	readAccess(ACCESS_PATH, lst);
 
-
+	//print(head);
 
 	/* Display Menu
 	while (1) {
@@ -246,10 +247,6 @@ void main() {
 	//printf("hi");
 
 	//scanf("%d", &);
-
-	//print(head);
-
-
 
 	//system("pause");
 }
