@@ -100,7 +100,7 @@ void insertLast(list *lst, User data)
 		lst->tail = link;
 	}
 }
-
+/*
 //delete first item
 int deleteFirst(list *lst)
 {
@@ -125,7 +125,7 @@ int deleteFirst(list *lst)
 	}
 	return 0;
 }
-
+/*
 //delete link at the last location
 int deleteLast(list *lst)
 {
