@@ -30,9 +30,11 @@ void getDateTime(int *day, int *month, int *year, int *hours, int *mins);
 void readAccess(char *path, list *lst) // Node *head) // 
 {
 	FILE *fp;
-	char temp[70], name[21], code[9], status[2], date_s[11], date_e[11], time_s[6], time_e[6];
+	char temp[70], name[21], code[9], date_s[11], date_e[11], time_s[6], time_e[6];
+	int status;
+	  
 	User d;
-	
+
 	fp = fopen(path, "rb"); //Reads all the data from the file and put it in fp
 	if (!fp)
 	{
@@ -42,16 +44,16 @@ void readAccess(char *path, list *lst) // Node *head) //
 
 	fgets(temp, 70, fp); //Cuts off the first line (headlines) from fp
 
-	while (fscanf(fp, "%20s %8s %1s %10s %10s %5s %5s %5d", name, code, status, date_s, date_e, time_s, time_e) != EOF)
+	while (fscanf(fp, "%20s %8s %1d %10s %10s %5s %5s %5d", name, code, &status, date_s, date_e, time_s, time_e) != EOF)
 	{
 		strcpy(d.name, name);
 		strcpy(d.code, code);
-		strcpy(d.status, status);
+		d.status = status;
 		strcpy(d.date_s, date_s);
 		strcpy(d.date_e, date_e);
 		strcpy(d.time_s, time_s);
 		strcpy(d.time_e, time_e);
-	
+
 		//printf(
 		//	"First Print:\nname: %s, code: %s, status: %s, date_s: %s, date_e: %s, time_s: %s, time_e: %s\n", 
 		//	d.name,
@@ -65,7 +67,7 @@ void readAccess(char *path, list *lst) // Node *head) //
 
 		//insert_bottom(d, &head);
 		insertLast(lst, d);
-		
+
 	}
 	print(lst);
 	fclose(fp);
@@ -94,7 +96,6 @@ node *addUser(node *user) {
 	printf("Enter Name And Code: ");
 	char input[16];
 	fgets(input, 15, stdin);
-
 	node *newUser = malloc(sizeof(node));
 	sscanf(input, "%s %s", newUser->user.name, newUser->user.code);
 	printf("Added:%s Code:%s\n\n", newUser->user.name, newUser->user.code);
@@ -102,7 +103,6 @@ node *addUser(node *user) {
 	if (user != NULL) {
 		user->next = newUser;
 	}
-
 	return newUser;
 }*/
 
@@ -125,7 +125,6 @@ void main() {
 
 	/* Display Menu
 	while (1) {
-
 		printf("\n *************\n");
 		printf("\n *  Linked list operations:        *\n");
 		printf("\n *  1. Insert at the top of list   *\n");
@@ -141,7 +140,6 @@ void main() {
 			scanf("%s", &temp); //clear input buffer
 			continue;
 		}
-
 		switch (option) {
 		case 1:        // Add to top
 			printf(" Enter a number to insert : ");
@@ -155,7 +153,6 @@ void main() {
 			printf("\nPress any key to continue...");
 			getch();
 			break;
-
 		case 2:    // add to bottom
 			printf(" Enter a number to insert : ");
 			if (scanf("%d", &num) != 1) {
@@ -168,7 +165,6 @@ void main() {
 			printf("\nPress any key to continue...");
 			getch();
 			break;
-
 		case 3:    // Insert After
 			printf(" Enter a number to insert : ");
 			if (scanf("%d", &num) != 1) {
@@ -176,7 +172,6 @@ void main() {
 				scanf("%s", &temp);
 				continue;
 			}
-
 			printf(" After which number do you want to insert : ");
 			if (scanf("%d", &prev_num) != 1) {
 				printf(" *Error: Invalid input.\n");
@@ -193,7 +188,6 @@ void main() {
 			printf("\nPress any key to continue...");
 			getch();
 			break;
-
 		case 4:    // Insert Before
 			printf(" Enter a number to insert : ");
 			if (scanf("%d", &num) != 1) {
@@ -201,14 +195,12 @@ void main() {
 				scanf("%s", &temp);
 				continue;
 			}
-
 			printf(" Before which number do you want to insert : ");
 			if (scanf("%d", &prev_num) != 1) {
 				printf(" *Error: Invalid input.\n");
 				scanf("%s", &temp);
 				continue;
 			}
-
 			if (head != NULL) {
 				head = insert_before(num, prev_num, head);
 				printf("Number %d inserted before %d", num, prev_num);
@@ -219,28 +211,23 @@ void main() {
 			printf("\nPress any key to continue...");
 			getch();
 			break;
-
 		case 5: // Show all elements
 			printf("\nElements in the list: \n [ ");
 			print(head);
 			printf("]\n\nPress any key to continue...");
 			getch();
 			break;
-
 		case 6:  // Exit
 			return(0);
 			break;
-
 		default:
 			printf("Invalid Option. Please Try again.");
 			getch();
-
 		} // End of Switch
 	} // End of While
-
 	return(0);
 	*/
-	
+
 
 	//newUser = addUser(NULL);
 	//printf("%s", newUser->user.name);
@@ -248,5 +235,5 @@ void main() {
 
 	//scanf("%d", &);
 
-	//system("pause");
+	system("pause");
 }

@@ -13,9 +13,9 @@ typedef struct user_data
 	char date_e[11];
 	char time_s[6];
 	char time_e[6];
-	char status[2];
+	int status;
 }User;
-	
+
 typedef struct node
 {
 	//list_type value;	
@@ -83,13 +83,13 @@ void insertLast(list *lst, User data)
 	//Node *current = lst;
 	link->data = data;
 	link->next = NULL;
-	link->prev = NULL;	
+	link->prev = NULL;
 
 	if (isEmpty(lst))
 	{
 		//make head & tail pointing to link
 		lst->head = lst->tail = link;
-	} 
+	}
 	else
 	{
 		//make link a new last link
@@ -109,7 +109,6 @@ int deleteFirst(list *lst)
 	{
 		//save reference to first link
 		Node *temp = lst->head;
-
 		//if only one link
 		if (temp->next == NULL)
 		{
@@ -134,7 +133,6 @@ int deleteLast(list *lst)
 	{
 		//save reference to last link
 		Node *temp = lst->tail;
-
 		//if only one link
 		if (temp->prev == NULL)
 		{
@@ -150,7 +148,6 @@ int deleteLast(list *lst)
 	}
 	return 0;
 }
-
 //delete a link at spesific index
 int deleteLink(list *lst, int idx)
 {
@@ -159,18 +156,15 @@ int deleteLink(list *lst, int idx)
 		int i;
 		//start from the first link
 		Node* current = lst->head;
-
 		//navigate through list
 		for (i = 0; i < idx && current != NULL;i++)
 			current = current->next;
-
 		if (current == NULL)
 			return 0;
 		if (current == lst->head)
 			return deleteFirst(lst);
 		if (current == lst->tail)
 			return deleteLast(lst);
-
 		//bypass the current link
 		current->prev->next = current->next;
 		current->next->prev = current->prev;
@@ -179,7 +173,6 @@ int deleteLink(list *lst, int idx)
 	}
 	return 0;
 }
-
 int insertAfter(list *lst, User data, int idx)
 {
 	if (!isEmpty(lst))
@@ -188,11 +181,9 @@ int insertAfter(list *lst, User data, int idx)
 		//start from the first link
 		Node* current = lst->head;
 		Node* newLink = NULL;
-
 		//navigate through list
 		for (i = 0; i < idx && current != NULL;i++)
 			current = current->next;
-
 		if (current == NULL)
 			return 0;
 		if (current == lst->tail)
@@ -200,7 +191,6 @@ int insertAfter(list *lst, User data, int idx)
 			insertLast(lst, data);
 			return 1;
 		}
-
 		//create a link
 		newLink = (Node*)malloc(sizeof(Node));
 		newLink->data = data;
@@ -214,7 +204,6 @@ int insertAfter(list *lst, User data, int idx)
 	}
 	return 0;
 }
-
 int insertBefore(list *lst, User data, int idx)
 {
 	if (!isEmpty(lst))
@@ -223,11 +212,9 @@ int insertBefore(list *lst, User data, int idx)
 		//start from the first link
 		Node* current = lst->head;
 		Node* newLink = NULL;
-
 		//navigate through list
 		for (i = 0; i < idx && current != NULL;i++)
 			current = current->next;
-
 		if (current == NULL)
 			return 0;
 		if (current == lst->head)
@@ -235,7 +222,6 @@ int insertBefore(list *lst, User data, int idx)
 			insertFirst(lst, data);
 			return 1;
 		}
-
 		//create a link
 		newLink = (Node*)malloc(sizeof(Node));
 		newLink->data = data;
@@ -249,7 +235,6 @@ int insertBefore(list *lst, User data, int idx)
 	}
 	return 0;
 }
-
 /* Print all the elements in the linked list */
 void print(list *lst) { //Node *head) {
 	Node *current_node = lst->head;
@@ -298,18 +283,16 @@ Node * insert_top(User data, Node *head) {
 }
 */
 
-/* Add a new node to the bottom of a list 
+/* Add a new node to the bottom of a list
 void insert_bottom(User data, Node **head) {
 	Node *current_node = *head;
 	Node *new_node;
 	while (current_node != NULL && current_node->next != NULL) {
 		current_node = current_node->next;
 	}
-
 	new_node = (Node *)malloc(sizeof(Node));
 	new_node->data = data;
 	new_node->next = NULL;
-
 	if (current_node != NULL) {
 		new_node->prev = current_node;
 		current_node->next = new_node;
@@ -317,9 +300,7 @@ void insert_bottom(User data, Node **head) {
 	else {
 		*head = new_node;
 	}
-
 }
-
 /* Add a new node after an element in the list
 Node * insert_after(int num, int prev_num, Node *head) {
 	Node *current_node = head;
@@ -333,8 +314,6 @@ Node * insert_after(int num, int prev_num, Node *head) {
 	current_node->next = new_node;
 	return head;
 }
-
-
 /* Add a new node before an element in the list
 Node * insert_before(int num, int next_num, Node *head) {
 	Node *current_node = head;
