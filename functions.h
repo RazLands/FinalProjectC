@@ -100,6 +100,30 @@ void insertLast(list *lst, User data)
 		lst->tail = link;
 	}
 }
+
+ AddUser(list *new) 
+{
+	 int status;
+	 User data;
+	 Node *newuser = (Node*)malloc(sizeof(Node));
+	 printf("Enter user name\n");
+	 scanf("%s", newuser->data.name);
+	 printf("Enter user code\n");
+	 scanf("%s", newuser->data.code);
+	 printf("Enter user entrance status\n");
+	 scanf("%d", &status);
+	 newuser->data.status = status;
+	 printf("Enter user permission start date\n");
+	 scanf("%s", newuser->data.date_s);
+	 printf("Enter user permission end date\n");
+	 scanf("%s", newuser->data.date_e);
+	 printf("Enter user permission start time\n");
+	 scanf("%s", newuser->data.time_s);
+	 printf("Enter user permission start time\n");
+	 scanf("%s", newuser->data.time_e);
+	
+	insertLast( new, newuser->data);
+}
 /*
 //delete first item
 int deleteFirst(list *lst)

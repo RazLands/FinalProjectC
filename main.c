@@ -120,7 +120,8 @@ void main() {
 
 	//readAccess(ACCESS_PATH, head);
 	readAccess(ACCESS_PATH, lst);
-
+	AddUser(lst);
+	print(lst);
 	//print(head);
 
 	/* Display Menu
