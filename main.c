@@ -15,7 +15,7 @@
 * When you submit the program make sure this path match to: "c:\\temp\\log.txt"
 ***/
 
-void readAccess(char *path, Node *head);
+void readAccess(char *path, list *lst); // Node *head)
 /***
 * Handle function: get's the path of the access file, and print all users information.
 * You may change it according to your needs.
@@ -27,89 +27,50 @@ void getDateTime(int *day, int *month, int *year, int *hours, int *mins);
 ***/
 
 
-void readAccess(char *path, Node *head)
+void readAccess(char *path, Node *head) //list *lst) // 
 {
 	FILE *fp;
 	char temp[70], name[21], code[9], status[2], date_s[11], date_e[11], time_s[6], time_e[6];
-	User *d = (User*)malloc(sizeof(User));
-	Node *current_node = head;
-	//int length;
-
-	fp = fopen(path, "rb");
-
-
+	User d;
+	
+	fp = fopen(path, "rb"); //Reads all the data from the file and put it in fp
 	if (!fp)
 	{
 		printf("File not found!\n");
 		return;
 	}
 
-	//length = countLines(fp);
-	fgets(temp, 70, fp);
-	//puts(temp);
-	//fscanf(fp, "%20s %8s %1d %10s %10s %5s %5s %5d", name, code, &status, date_s, date_e, time_s, time_e, &pulse);
-	fgets(name, 22, fp);
-	fgets(code, 10, fp);
-	fgets(status, 3, fp);
-	fgets(date_s, 12, fp);
-	fgets(date_e, 12, fp);
-	fgets(time_s, 7, fp);
-	fgets(time_e, 7, fp);
-	*d->name=name;
-	*d->code = code;
-	*d->status = status;
-	*d->date_s = date_s;
-	*d->date_e = date_e;
-	*d->time_s = time_s;
-	*d->time_e = time_e;	
-	
-	head = insert_bottom(d, head);
-	current_node = head;
-	//head->next = current_node;
-	head = head->next;
+	fgets(temp, 70, fp); //Cuts off the first line (headlines) from fp
 
-	while (fscanf(fp, "%20s %8s %1d %10s %10s %5s %5s %5d", *d->name, *d->code, *d->status, *d->date_s, *d->date_e, *d->time_s, *d->time_e))
+	while (fscanf(fp, "%20s %8s %1s %10s %10s %5s %5s %5d", name, code, status, date_s, date_e, time_s, time_e) != EOF)
 	{
-		current_node->next = NULL;
-		//printf("%s %s %d %s %s %s %s %d\n", name, code, status, date_s, date_e, time_s, time_e);
-		//data = malloc(sizeof(User));
-		//User d = {  name, code, date_s, date_e, time_s, time_e, status };
-		/*data->name = name;
-		data->code = code;
-		data->status = status;
-		data->date_s = date_s;
-		data->date_e = date_e;
-		data->time_s = time_s;
-		data->time_e = time_e;*/
+		strcpy(d.name, name);
+		strcpy(d.code, code);
+		strcpy(d.status, status);
+		strcpy(d.date_s, date_s);
+		strcpy(d.date_e, date_e);
+		strcpy(d.time_s, time_s);
+		strcpy(d.time_e, time_e);
+	
 		printf(
-			"First Print:\nname: %s, code: %s, status: %d, date_s: %s, date_e: %s, time_s: %s, time_e: %s\n", 
-			d->name,
-			d->code,
-			d->status,
-			d->date_s,
-			d->date_e,
-			d->time_s,
-			d->time_e		
+			"First Print:\nname: %s, code: %s, status: %s, date_s: %s, date_e: %s, time_s: %s, time_e: %s\n", 
+			d.name,
+			d.code,
+			d.status,
+			d.date_s,
+			d.date_e,
+			d.time_s,
+			d.time_e		
 		);
-/*
-		if (head == NULL)
-			head->data = d;
-		else
-		{
-			head = head->next;
-			head->data = d;
-		}
 
-		head = head->next;
-*/		
-		//current_node = insert_bottom(d, current_node);
-		head = insert_bottom(d, current_node);
-		//current_node = current_node->next;
-		head = head->next;
+		insert_bottom(d, &head);
+		//insertLast(lst, d);
+		
 	}
 
 	fclose(fp);
 	return head;
+	//return lst;
 }
 
 
@@ -150,10 +111,14 @@ void main() {
 
 	Node *head = (Node *)malloc(sizeof(Node));
 	head = NULL;
+	//list *lst = (list *)malloc(sizeof(list));
+	//lst->head = NULL;
+	//lst->tail = NULL;
 	int option;
 	char * temp;
 
 	readAccess(ACCESS_PATH, head);
+	//readAccess(ACCESS_PATH, lst);
 
 
 
