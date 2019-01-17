@@ -238,10 +238,14 @@ int insertBefore(list *lst, User data, int idx)
 	}
 	return 0;
 }
-/* Print all the elements in the linked list */
 
-void print(list *lst) { //Node *head) {
+/* Print all the elements in the linked list */
+void print(char *path, list *lst) { //Node *head) {
 	Node *current_node = lst->head;
+	FILE *fp;
+	char name[21];
+	fp = fopen(path, "r");
+	fp = fopen(path, "w");
 	while (current_node != NULL) {
 		printf("%s ", current_node->data.name);
 		printf("%s ", current_node->data.code);
@@ -251,8 +255,20 @@ void print(list *lst) { //Node *head) {
 		printf("%s ", current_node->data.time_s);
 		printf("%s ", current_node->data.time_e);
 		printf("\n");
+
+		strcpy(name, current_node->data.name);
+		fprintf(fp, "%s %8s %1d %10s %10s %5s %5s\n",
+			name,
+			current_node->data.code, 
+			current_node->data.status,
+			current_node->data.date_s,
+			current_node->data.date_e,
+			current_node->data.time_s,
+			current_node->data.time_e
+			);
 		current_node = current_node->next;
 	}
+	fclose(fp);
 }
 
 void readAccess(char *path, list *lst) // Node *head) // 
@@ -286,11 +302,10 @@ void readAccess(char *path, list *lst) // Node *head) //
 		strcpy(d.time_s, time_s);
 		strcpy(d.time_e, time_e);
 
-		//insert_bottom(d, &head);
 		insertLast(lst, d);
 
 	}
-	print(lst);
+	//print(lst);
 	fclose(fp);
 	return lst;
 	//return lst;
@@ -332,7 +347,7 @@ void AddUser(list *new)
 		insertLast(new, newuser->data);
 }
 
-void search(list *lst, char *name, int status) {
+void search(char *path, list *lst, char *name, int status) {
 	Node *current_node = lst->head;
 	list *srch_list = (list *)malloc(sizeof(list));
 	init_list(srch_list);
@@ -346,8 +361,12 @@ void search(list *lst, char *name, int status) {
 			insertLast(srch_list, current_node->data);
 		current_node = current_node->next;
 	}
-	print(srch_list);
+	print(path, srch_list);
 	return srch_list;
+	}
+
+void updateUser() {
+
 }
 
 int countLines(FILE *fp)

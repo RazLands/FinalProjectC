@@ -34,22 +34,13 @@ void getDateTime(int *day, int *month, int *year, int *hours, int *mins)
 }
 
 void main() {
-
-	//Node *head = (Node *)malloc(sizeof(Node));
-	//head = NULL;
 	list *lst = (list *)malloc(sizeof(list));
 	init_list(lst);
-	//lst->head = NULL;
-	//lst->tail = NULL;
 	int option, srch_action, srch_status;
 	char * temp;
 	char srch_name[21];
 
-	//readAccess(ACCESS_PATH, head);
 	readAccess(ACCESS_PATH, lst);
-	//AddUser(lst);
-	//print(lst);
-	//print(head);
 
 	/* Display Menu */
 	while (1) {
@@ -75,17 +66,17 @@ void main() {
 			if (srch_action == 1) {
 				printf("Enter the NAME you want to search for: ");
 				scanf("%20s", srch_name);
-				search(lst, srch_name, 0);
+				search(ACCESS_PATH, lst, srch_name, 0);
 			}
 			else if (srch_action == 2) {
 				printf("Enter the STATUS you want to search for: ");
 				scanf("%d", &srch_status);
-				search(lst, "", srch_status);
+				search(ACCESS_PATH, lst, "", srch_status);
 			}
 			break;
 		case 2:    // add new user
 			AddUser(lst);
-			print(lst);
+			print(ACCESS_PATH, lst);
 			break;
 /*		case 3:    // Insert After
 			printf(" Enter a number to insert : ");
