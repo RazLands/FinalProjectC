@@ -46,14 +46,14 @@ void main() {
 	while (1) {
 		printf("\n *************\n");
 		printf("\n *  Linked list operations:        *\n");
-		printf("\n *  1. Insert at the top of list   *\n");
-		printf("\n *  2. Insert at bottom of list    *\n");
-		printf("\n *  3. Insert after an element     *\n");
-		printf("\n *  4. Insert before an element    *\n");
-		printf("\n *  5. Show all elements           *\n");
+		printf("\n *  1. SEARCH USER/STATUS   *\n");
+		printf("\n *  2. ADD NEW USER    *\n");
+		printf("\n *  3.      *\n");
+		printf("\n *  4.     *\n");
+		printf("\n *  5.            *\n");
 		printf("\n *  6. Quit                        *\n");
 		printf("\n *************\n");
-		printf("\n Choose an option [1-5] : ");
+		printf("\n Choose an option [1-5]. Exit [6]: ");
 		if (scanf("%d", &option) != 1) {
 			printf(" *Error: Invalid input. Try again.\n");
 			scanf("%s", &temp); //clear input buffer
@@ -129,23 +129,16 @@ void main() {
 			print(head);
 			printf("]\n\nPress any key to continue...");
 			getch();
-			break;
+			break;*/
 		case 6:  // Exit
 			return(0);
 			break;
-*/		default:
+		default:
 			printf("Invalid Option. Please Try again.");
 			getch();
 		} // End of Switch
 	} // End of While
 	return(0);
 
-
-	//newUser = addUser(NULL);
-	//printf("%s", newUser->user.name);
-	//printf("hi");
-
-	//scanf("%d", &);
-
-	system("pause");
+	//system("pause");
 }

@@ -184,7 +184,7 @@ int insertAfter(list *lst, User data, int idx)
 		Node* current = lst->head;
 		Node *newLink = NULL;
 		//navigate through list
-		for (i = 0; i < idx && current != NULL; i++)
+		for (i = 0; i < idx && current != NULL;i++)
 			current = current->next;
 		if (current == NULL)
 			return 0;
@@ -216,7 +216,7 @@ int insertBefore(list *lst, User data, int idx)
 		Node* current = lst->head;
 		Node* newLink = NULL;
 		//navigate through list
-		for (i = 0; i < idx && current != NULL; i++)
+		for (i = 0; i < idx && current != NULL;i++)
 			current = current->next;
 		if (current == NULL)
 			return 0;
@@ -242,22 +242,15 @@ int insertBefore(list *lst, User data, int idx)
 /* Print all the elements in the linked list */
 void print(char *path, list *lst) { //Node *head) {
 	Node *current_node = lst->head;
-	
-	FILE *fp = fopen(path, "w");
-	//char name[21];
-	
+	char name[21];
+	char* s;
+	FILE *fp = fopen(path, "wb");
+	char* headers = "Name                 Code     S Start date End date   Stime Etime\r\n";
+	fputs(headers, fp);
+	printf("\nThe new users list:\n%s", headers); //Print headers' line to the console
 	
 	while (current_node != NULL) {
-		printf("%s ", current_node->data.name);
-		printf("%s ", current_node->data.code);
-		printf("%d ", current_node->data.status);
-		printf("%s ", current_node->data.date_s);
-		printf("%s ", current_node->data.date_e);
-		printf("%s ", current_node->data.time_s);
-		printf("%s ", current_node->data.time_e);
-		printf("\n");
-
-		fprintf(fp, "%-20s %-8s %-1d %-10s %-10s %-5s %-5s\n",
+		printf("%-20s %-8s %-1d %-10s %-10s %-5s %-5s\n",
 			current_node->data.name,
 			current_node->data.code,
 			current_node->data.status,
@@ -265,11 +258,17 @@ void print(char *path, list *lst) { //Node *head) {
 			current_node->data.date_e,
 			current_node->data.time_s,
 			current_node->data.time_e);
-		
-		
+
+		fprintf(fp, "%-20s %-8s %-1d %-10s %-10s %-5s %-5s\r\n",
+			current_node->data.name,
+			current_node->data.code,
+			current_node->data.status,
+			current_node->data.date_s,
+			current_node->data.date_e,
+			current_node->data.time_s,
+			current_node->data.time_e);
 		current_node = current_node->next;
 	}
-	
 	fclose(fp);
 }
 
@@ -310,7 +309,6 @@ void readAccess(char *path, list *lst) // Node *head) //
 	//print(lst);
 	fclose(fp);
 	return lst;
-	//return lst;
 }
 
 void AddUser(list *new)
@@ -359,17 +357,15 @@ void search(char *path, list *lst, char *name, int status) {
 	}
 
 	while (current_node != NULL) {
-		if (strcmp(current_node->data.name, name) == 0 || current_node->data.status == status)
+		if (strcmp(current_node->data.name,name) == 0 || current_node->data.status == status)
 			insertLast(srch_list, current_node->data);
 		current_node = current_node->next;
 	}
 	print(path, srch_list);
 	return srch_list;
-}
+	}
 
-void updateUser() {
-
-}
+//void updateUser();
 
 int countLines(FILE *fp)
 {
