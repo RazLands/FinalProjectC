@@ -184,7 +184,7 @@ int insertAfter(list *lst, User data, int idx)
 		Node* current = lst->head;
 		Node *newLink = NULL;
 		//navigate through list
-		for (i = 0; i < idx && current != NULL;i++)
+		for (i = 0; i < idx && current != NULL; i++)
 			current = current->next;
 		if (current == NULL)
 			return 0;
@@ -216,7 +216,7 @@ int insertBefore(list *lst, User data, int idx)
 		Node* current = lst->head;
 		Node* newLink = NULL;
 		//navigate through list
-		for (i = 0; i < idx && current != NULL;i++)
+		for (i = 0; i < idx && current != NULL; i++)
 			current = current->next;
 		if (current == NULL)
 			return 0;
@@ -242,10 +242,11 @@ int insertBefore(list *lst, User data, int idx)
 /* Print all the elements in the linked list */
 void print(char *path, list *lst) { //Node *head) {
 	Node *current_node = lst->head;
-	FILE *fp;
-	char name[21];
-	fp = fopen(path, "r");
-	fp = fopen(path, "w");
+	
+	FILE *fp = fopen(path, "w");
+	//char name[21];
+	
+	
 	while (current_node != NULL) {
 		printf("%s ", current_node->data.name);
 		printf("%s ", current_node->data.code);
@@ -256,18 +257,19 @@ void print(char *path, list *lst) { //Node *head) {
 		printf("%s ", current_node->data.time_e);
 		printf("\n");
 
-		strcpy(name, current_node->data.name);
-		fprintf(fp, "%s %8s %1d %10s %10s %5s %5s\n",
-			name,
-			current_node->data.code, 
+		fprintf(fp, "%-20s %-8s %-1d %-10s %-10s %-5s %-5s\n",
+			current_node->data.name,
+			current_node->data.code,
 			current_node->data.status,
 			current_node->data.date_s,
 			current_node->data.date_e,
 			current_node->data.time_s,
-			current_node->data.time_e
-			);
+			current_node->data.time_e);
+		
+		
 		current_node = current_node->next;
 	}
+	
 	fclose(fp);
 }
 
@@ -357,13 +359,13 @@ void search(char *path, list *lst, char *name, int status) {
 	}
 
 	while (current_node != NULL) {
-		if (strcmp(current_node->data.name,name) == 0 || current_node->data.status == status)
+		if (strcmp(current_node->data.name, name) == 0 || current_node->data.status == status)
 			insertLast(srch_list, current_node->data);
 		current_node = current_node->next;
 	}
 	print(path, srch_list);
 	return srch_list;
-	}
+}
 
 void updateUser() {
 
