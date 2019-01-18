@@ -20,8 +20,8 @@ typedef struct node
 {
 	//list_type value;	
 	User data;
-	struct Node *next;
-	struct Node *prev;
+	struct node *next;
+	struct node *prev;
 }Node;
 
 typedef struct list
@@ -80,7 +80,6 @@ void insertLast(list *lst, User data)
 {
 	//create a new link
 	Node *link = (Node*)malloc(sizeof(Node));
-	//Node *current = lst;
 	link->data = data;
 	link->next = NULL;
 	link->prev = NULL;
@@ -101,30 +100,6 @@ void insertLast(list *lst, User data)
 	}
 }
 
- AddUser(list *new) 
-{
-	 int status;
-	 User data;
-	 Node *newuser = (Node*)malloc(sizeof(Node));
-	 printf("Enter user name\n");
-	 scanf("%s", newuser->data.name);
-	 printf("Enter user code\n");
-	 scanf("%s", newuser->data.code);
-	 printf("Enter user entrance status\n");
-	 scanf("%d", &status);
-	 newuser->data.status = status;
-	 printf("Enter user permission start date\n");
-	 scanf("%s", newuser->data.date_s);
-	 printf("Enter user permission end date\n");
-	 scanf("%s", newuser->data.date_e);
-	 printf("Enter user permission start time\n");
-	 scanf("%s", newuser->data.time_s);
-	 printf("Enter user permission start time\n");
-	 scanf("%s", newuser->data.time_e);
-	
-	insertLast( new, newuser->data);
-}
-/*
 //delete first item
 int deleteFirst(list *lst)
 {
@@ -148,7 +123,7 @@ int deleteFirst(list *lst)
 	}
 	return 0;
 }
-/*
+
 //delete link at the last location
 int deleteLast(list *lst)
 {
@@ -172,6 +147,7 @@ int deleteLast(list *lst)
 	}
 	return 0;
 }
+
 //delete a link at spesific index
 int deleteLink(list *lst, int idx)
 {
@@ -197,6 +173,7 @@ int deleteLink(list *lst, int idx)
 	}
 	return 0;
 }
+
 int insertAfter(list *lst, User data, int idx)
 {
 	if (!isEmpty(lst))
@@ -204,7 +181,7 @@ int insertAfter(list *lst, User data, int idx)
 		int i;
 		//start from the first link
 		Node* current = lst->head;
-		Node* newLink = NULL;
+		Node *newLink = NULL;
 		//navigate through list
 		for (i = 0; i < idx && current != NULL;i++)
 			current = current->next;
@@ -228,6 +205,7 @@ int insertAfter(list *lst, User data, int idx)
 	}
 	return 0;
 }
+
 int insertBefore(list *lst, User data, int idx)
 {
 	if (!isEmpty(lst))
@@ -259,20 +237,183 @@ int insertBefore(list *lst, User data, int idx)
 	}
 	return 0;
 }
-/* Print all the elements in the linked list */
-void print(list *lst) { //Node *head) {
+
+void writeToFile (char *path, list *lst) {
 	Node *current_node = lst->head;
+	FILE *fp = fopen(path, "wb");
+	char* headers = "Name                 Code     S Start date End date   Stime Etime\r\n";
+
+	fputs(headers, fp);
 	while (current_node != NULL) {
-		printf("%s ", current_node->data.name);
-		printf("%s ", current_node->data.code);
-		printf("%d ", current_node->data.status);
-		printf("%s ", current_node->data.date_s);
-		printf("%s ", current_node->data.date_e);
-		printf("%s ", current_node->data.time_s);
-		printf("%s ", current_node->data.time_e);
-		printf("\n");
+		fprintf(fp, "%-20s %-8s %-1d %-10s %-10s %-5s %-5s\r\n",
+			current_node->data.name,
+			current_node->data.code,
+			current_node->data.status,
+			current_node->data.date_s,
+			current_node->data.date_e,
+			current_node->data.time_s,
+			current_node->data.time_e);
 		current_node = current_node->next;
 	}
+	fclose(fp);
+}
+/* Print all the elements in the linked list */
+void print(char *path, list *lst) { //Node *head) {
+	Node *current_node = lst->head;	
+	
+	//printf("\nThe current users list:\n%s", headers); //Print headers' line to the console
+	
+	while (current_node != NULL) {
+		printf("%-20s %-8s %-1d %-10s %-10s %-5s %-5s\n",
+			current_node->data.name,
+			current_node->data.code,
+			current_node->data.status,
+			current_node->data.date_s,
+			current_node->data.date_e,
+			current_node->data.time_s,
+			current_node->data.time_e);		
+		current_node = current_node->next;
+	}
+}
+
+void readAccess(char *path, list *lst) // Node *head) // 
+{
+	/***
+	* Handle function: get's the path of the access file, and print all users information.
+	* You may change it according to your needs.
+	***/
+	FILE *fp;
+	char temp[70], name[21], code[9], date_s[11], date_e[11], time_s[6], time_e[6];
+	int status;
+
+	User d;
+
+	fp = fopen(path, "rb"); //Reads all the data from the file and put it in fp
+	if (!fp)
+	{
+		printf("File not found!\n");
+		return;
+	}
+
+	fgets(temp, 70, fp); //Cuts off the first line (headlines) from fp
+
+	while (fscanf(fp, "%20s %8s %1d %10s %10s %5s %5s", name, code, &status, date_s, date_e, time_s, time_e) != EOF)
+	{
+		strcpy(d.name, name);
+		strcpy(d.code, code);
+		d.status = status;
+		strcpy(d.date_s, date_s);
+		strcpy(d.date_e, date_e);
+		strcpy(d.time_s, time_s);
+		strcpy(d.time_e, time_e);
+
+		insertLast(lst, d);
+
+	}
+	//print(lst);
+	fclose(fp);
+	return lst;
+}
+
+void AddUser(list *new)
+{
+	int status, count, check;
+	User data;
+	Node *newuser = (Node*)malloc(sizeof(Node));
+	Node *cmpuser = new->head;
+	printf("Enter user name: ");
+	scanf("%s", newuser->data.name);
+	printf("Enter user code: ");
+	scanf("%s", newuser->data.code);
+	printf("Enter user entrance status: ");
+	scanf("%d", &status);
+	newuser->data.status = status;
+	printf("Enter user permission start date: ");
+	scanf("%s", newuser->data.date_s);
+	printf("Enter user permission end date: ");
+	scanf("%s", newuser->data.date_e);
+	printf("Enter user permission start time: ");
+	scanf("%s", newuser->data.time_s);
+	printf("Enter user permission start time: ");
+	scanf("%s", newuser->data.time_e);
+	count = check = 0;
+	while (cmpuser != NULL)
+	{
+		if (strcmp(cmpuser->data.code, newuser->data.code) > 0) {
+			insertBefore(new, newuser->data, count);
+			check = 1;
+			break;
+		}
+		count++;
+		cmpuser = cmpuser->next;
+	}
+	if (check == 0)
+		insertLast(new, newuser->data);
+}
+
+list *search(char *path, list *lst, char *name, int status, char *code) {
+	Node *current_node = lst->head;
+	list *rslt_list = (list *)malloc(sizeof(list));
+	init_list(rslt_list);
+
+	if (isEmpty(lst)) {
+		return;
+	}
+
+	while (current_node != NULL) {
+		if (strcmp(current_node->data.name,name) == 0 || current_node->data.status == status || strcmp(current_node->data.code, code) == 0)
+			insertLast(rslt_list, current_node->data);
+		current_node = current_node->next;
+	}
+	//print(path, rslt_list);
+	return rslt_list;
+	}
+
+void updateUser(char *path, list *lst, char *name, int status, char *code) {
+	int count, check;
+	char date_s[11], date_e[11], time_s[6], time_e[6];
+	list *rslt_list = (list *)malloc(sizeof(list));
+	Node *updt_node;
+	Node *cmpuser = lst->head;
+	User d;
+	init_list(rslt_list);
+
+	if (name) {
+		if (status == 0) {
+			printf("Enter new START and END date, START and END time (dd/mm/yyyy hh:mm) for user %s: ", name);
+			scanf("%s %s %s %s", date_s, date_e, time_s, time_e);
+			printf("%s %s %s %s", date_s, date_e, time_s, time_e);
+
+			rslt_list = search(path, lst, name, 0, "");
+			updt_node = rslt_list->head;
+
+			strcpy(d.name, updt_node->data.name);
+			strcpy(d.code, updt_node->data.code);
+			d.status = updt_node->data.status;
+			strcpy(d.date_s, date_s);
+			strcpy(d.date_e, date_e);
+			strcpy(d.time_s, date_s);
+			strcpy(d.time_e, date_e);
+
+		}
+	}
+
+	count = check = 0;
+	while (cmpuser != NULL)
+	{
+		if (strcmp(cmpuser->data.code, updt_node->data.code) == 0) {
+			insertBefore(lst, updt_node->data, count);
+			deleteLink(lst, count);
+			check = 1;
+			break;
+		}
+		count++;
+		cmpuser = cmpuser->next;
+	}
+	if (check == 0)
+		insertLast(lst, updt_node->data);
+
+	writeToFile(path, lst);
 }
 
 int countLines(FILE *fp)
@@ -288,66 +429,3 @@ int countLines(FILE *fp)
 	fclose(fp);
 	return count;
 }
-
-
-
-
-
-
-
-
-/* Add a new node to the top of a list
-Node * insert_top(User data, Node *head) {
-	Node *new_node = (Node *)malloc(sizeof(Node));
-	new_node->data = data;
-	new_node->next = head;
-	head->prev = new_node;
-	head = new_node;
-	return head;
-}
-*/
-
-/* Add a new node to the bottom of a list
-void insert_bottom(User data, Node **head) {
-	Node *current_node = *head;
-	Node *new_node;
-	while (current_node != NULL && current_node->next != NULL) {
-		current_node = current_node->next;
-	}
-	new_node = (Node *)malloc(sizeof(Node));
-	new_node->data = data;
-	new_node->next = NULL;
-	if (current_node != NULL) {
-		new_node->prev = current_node;
-		current_node->next = new_node;
-	}
-	else {
-		*head = new_node;
-	}
-}
-/* Add a new node after an element in the list
-Node * insert_after(int num, int prev_num, Node *head) {
-	Node *current_node = head;
-	Node *new_node;
-	while (current_node->data != prev_num) {
-		current_node = current_node->next;
-	}
-	new_node = (Node *)malloc(sizeof(Node));
-	new_node->data = num;
-	new_node->next = current_node->next;
-	current_node->next = new_node;
-	return head;
-}
-/* Add a new node before an element in the list
-Node * insert_before(int num, int next_num, Node *head) {
-	Node *current_node = head;
-	Node *new_node;
-	while (&current_node->next->data != next_num) {
-		current_node = current_node->next;
-	}
-	new_node = (Node *)malloc(sizeof(Node));
-	new_node->data = num;
-	new_node->next = current_node->next;
-	current_node->next = new_node;
-	return head;
-}*/
