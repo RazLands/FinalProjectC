@@ -1,0 +1,8 @@
+Name/Code             door Status                date       time
+21                     5     22                   10          5
+entry available
+Not Authorised user
+Unknown user
+Not Authorised - Door
+Not Authorised - Date
+Not Authorised - Hour
