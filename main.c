@@ -15,69 +15,11 @@
 * When you submit the program make sure this path match to: "c:\\temp\\log.txt"
 ***/
 
-void readAccess(char *path, list *lst); //Node *head); // 
-/***
-* Handle function: get's the path of the access file, and print all users information.
-* You may change it according to your needs.
-***/
-
-void getDateTime(int *day, int *month, int *year, int *hours, int *mins);
-/***
-* Handle function: Returns by referfance the current date and time
-***/
-
-
-void readAccess(char *path, list *lst) // Node *head) // 
-{
-	FILE *fp;
-	char temp[70], name[21], code[9], date_s[11], date_e[11], time_s[6], time_e[6];
-	int status;
-	  
-	User d;
-
-	fp = fopen(path, "rb"); //Reads all the data from the file and put it in fp
-	if (!fp)
-	{
-		printf("File not found!\n");
-		return;
-	}
-
-	fgets(temp, 70, fp); //Cuts off the first line (headlines) from fp
-
-	while (fscanf(fp, "%20s %8s %1d %10s %10s %5s %5s %5d", name, code, &status, date_s, date_e, time_s, time_e) != EOF)
-	{
-		strcpy(d.name, name);
-		strcpy(d.code, code);
-		d.status = status;
-		strcpy(d.date_s, date_s);
-		strcpy(d.date_e, date_e);
-		strcpy(d.time_s, time_s);
-		strcpy(d.time_e, time_e);
-
-		//printf(
-		//	"First Print:\nname: %s, code: %s, status: %s, date_s: %s, date_e: %s, time_s: %s, time_e: %s\n", 
-		//	d.name,
-		//	d.code,
-		//	d.status,
-		//	d.date_s,
-		//	d.date_e,
-		//	d.time_s,
-		//	d.time_e		
-		//);
-
-		//insert_bottom(d, &head);
-		insertLast(lst, d);
-
-	}
-	print(lst);
-	fclose(fp);
-	return lst;
-	//return lst;
-}
-
-
 void getDateTime(int *day, int *month, int *year, int *hours, int *mins)
 {
+	/***
+	* Handle function: Returns by referfance the current date and time
+	***/
 	time_t rawtime;
 	struct tm *timeinfo;
 
@@ -91,105 +33,136 @@ void getDateTime(int *day, int *month, int *year, int *hours, int *mins)
 	*mins = timeinfo->tm_min;
 }
 
-/*
-node *addUser(node *user) {
-	printf("Enter Name And Code: ");
-	char input[16];
-	fgets(input, 15, stdin);
-	node *newUser = malloc(sizeof(node));
-	sscanf(input, "%s %s", newUser->user.name, newUser->user.code);
-	printf("Added:%s Code:%s\n\n", newUser->user.name, newUser->user.code);
-	newUser->next = NULL;
-	if (user != NULL) {
-		user->next = newUser;
-	}
-	return newUser;
-}*/
-
-
 void main() {
-
-	//Node *head = (Node *)malloc(sizeof(Node));
-	//head = NULL;
 	list *lst = (list *)malloc(sizeof(list));
+	list *srch_list = (list *)malloc(sizeof(list));
+	int option, action, srch_status;
+	char *temp;
+	char *updt_name = (char*)malloc(sizeof(char));
+	char srch_name[21], srch_code[9];
+
 	init_list(lst);
-	//lst->head = NULL;
-	//lst->tail = NULL;
-	int option;
-	char * temp;
-
-	//readAccess(ACCESS_PATH, head);
+	init_list(srch_list);
 	readAccess(ACCESS_PATH, lst);
-	AddUser(lst);
-	print(lst);
-	//print(head);
 
-	/* Display Menu
+	/* Display Menu */
 	while (1) {
-		printf("\n *************\n");
-		printf("\n *  Linked list operations:        *\n");
-		printf("\n *  1. Insert at the top of list   *\n");
-		printf("\n *  2. Insert at bottom of list    *\n");
-		printf("\n *  3. Insert after an element     *\n");
-		printf("\n *  4. Insert before an element    *\n");
-		printf("\n *  5. Show all elements           *\n");
-		printf("\n *  6. Quit                        *\n");
-		printf("\n *************\n");
-		printf("\n Choose an option [1-5] : ");
+		// Operations menu
+		{
+			printf("\n *************\n");
+			printf("\n *  Linked list operations:        *\n");
+			printf("\n *  1. SEARCH USER/STATUS   *\n");
+			printf("\n *  2. ADD NEW USER    *\n");
+			printf("\n *  3. UPDATE USER'S PERMISSIONS     *\n");
+			printf("\n *  4.     *\n");
+			printf("\n *  5.            *\n");
+			printf("\n *  6. Quit                        *\n");
+			printf("\n *************\n");
+			printf("\n Choose an option [1-5]. Exit [6]: ");
+		}
 		if (scanf("%d", &option) != 1) {
 			printf(" *Error: Invalid input. Try again.\n");
 			scanf("%s", &temp); //clear input buffer
 			continue;
 		}
 		switch (option) {
-		case 1:        // Add to top
-			printf(" Enter a number to insert : ");
-			if (scanf("%d", &num) != 1) {
-				printf(" *Error: Invalid input.\n");
-				scanf("%s", &temp);   //clear input buffer
-				continue;
+		
+		// Search for user by its name(s) (1) or ststus (2) or code (3)
+		case 1:  {      
+			printf("Choose searching by user NAME (1) or STATUS (2) or CODE (3): ");
+			scanf("%d", &action);
+
+			// Search a user by user NAME
+			if (action == 1) {
+				printf("Enter the NAME you want to search for: ");
+				scanf("%20s", srch_name);
+				srch_list = search(ACCESS_PATH, lst, srch_name, 0, "");
+				print(ACCESS_PATH, srch_list);
 			}
-			head = insert_top(num, head);
-			printf("Number %d added to the top of the list", num);
-			printf("\nPress any key to continue...");
-			getch();
+
+			// Search a user by user STATUS
+			else if (action == 2) {
+				printf("Enter the STATUS you want to search for: ");
+				scanf("%d", &srch_status);
+				srch_list = search(ACCESS_PATH, lst, "", srch_status, "");
+				print(ACCESS_PATH, srch_list);
+			}
+
+			// Search a user by user CODE
+			else if (action == 3) {
+				printf("Enter the CODE you want to search for: ");
+				scanf("%8s", &srch_code);
+				srch_list = search(ACCESS_PATH, lst, "", 0, srch_code);
+				print(ACCESS_PATH, srch_list);
+			}
 			break;
-		case 2:    // add to bottom
-			printf(" Enter a number to insert : ");
-			if (scanf("%d", &num) != 1) {
-				printf(" *Error: Invalid input. \n");
-				scanf("%s", &temp);
-				continue;
-			}
-			head = insert_bottom(num, head);
-			printf("%d added to the bottom of the list", num);
-			printf("\nPress any key to continue...");
-			getch();
+		}
+		
+		// add new user
+		case 2: {   
+			AddUser(lst);
+			writeToFile(ACCESS_PATH, lst);
+			print(ACCESS_PATH, lst);
 			break;
-		case 3:    // Insert After
-			printf(" Enter a number to insert : ");
-			if (scanf("%d", &num) != 1) {
-				printf(" *Error: Invalid input.\n");
-				scanf("%s", &temp);
-				continue;
+		}
+
+		// Update user's permissions
+		case 3: {
+			printf("Type '1' (name) or '2' (code) to choose which user to update. Type '3' to see current users list: ");
+			scanf("%d", &action);
+
+			// Print the current users list to the console
+			if (action == 3) {
+				print(ACCESS_PATH, lst);
+				//getch();
+				printf("Type '1' (name) or '2' (code) to choose which user to update: ");
+				scanf("%d", &action);
 			}
-			printf(" After which number do you want to insert : ");
-			if (scanf("%d", &prev_num) != 1) {
-				printf(" *Error: Invalid input.\n");
-				scanf("%s", &temp);
-				continue;
+
+			// Update user by its user NAME
+			if (action == 1) {
+				printf("Enter a user NAME to update: ");
+				scanf("%s", srch_name);
+
+				printf("Choose which paramet to update: STATUS (1), TIME RANGE (2): ");
+				scanf("%d", &option);
+
+				// Find user by its NAME and update his permissions status 
+				if (option == 1) {
+					printf("Enter the new status permission for user %s: ", srch_name);
+					scanf("%d", &srch_status);
+					updateUser(ACCESS_PATH, lst, srch_name, srch_status, "");
+				}
+
+				// Find user by its NAME and update user's date and time range permission
+				if (option == 2) {
+					updateUser(ACCESS_PATH, lst, srch_name, 0, "");
+				}
 			}
-			if (head != NULL) {
-				head = insert_after(num, prev_num, head);
-				printf("%d is inserted after %d", num, prev_num);
+
+			// Update user by its user CODE
+			else if (action == 2) {
+				printf("Enter a user CODE to update: ");
+				scanf("%s", srch_code);
+				printf("Choose which paramet to update: STATUS (1), TIME RANGE (2): ");
+				scanf("%d", &option);
+
+				// Find user by its NAME and update his permissions status 
+				if (option == 1) {
+					printf("Enter the new status permission for user code %s: ", srch_code);
+					scanf("%d", &srch_status);
+					updateUser(ACCESS_PATH, lst, "", srch_status, srch_code);
+				}
+				// Find user by its NAME and update user's date and time range permission
+				if (option == 2) {
+					updateUser(ACCESS_PATH, lst, "", 0, srch_code);
+				}
 			}
-			else {
-				printf("The list is empty", num, prev_num);
-			}
-			printf("\nPress any key to continue...");
-			getch();
+
 			break;
-		case 4:    // Insert Before
+		}
+
+/*		case 4:    // Insert Before
 			printf(" Enter a number to insert : ");
 			if (scanf("%d", &num) != 1) {
 				printf(" *Error: Invalid input. \n");
@@ -217,8 +190,11 @@ void main() {
 			print(head);
 			printf("]\n\nPress any key to continue...");
 			getch();
-			break;
+			break;*/
 		case 6:  // Exit
+			free(lst);
+			free(srch_list);
+			free(updt_name);
 			return(0);
 			break;
 		default:
@@ -227,14 +203,6 @@ void main() {
 		} // End of Switch
 	} // End of While
 	return(0);
-	*/
 
-
-	//newUser = addUser(NULL);
-	//printf("%s", newUser->user.name);
-	//printf("hi");
-
-	//scanf("%d", &);
-
-	system("pause");
+	//system("pause");
 }
