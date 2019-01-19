@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
-
 /* Node Stucture */
 typedef char list_type;
 
@@ -26,7 +25,7 @@ typedef struct user_request
 }Request;
 
 typedef struct node
-{	
+{
 	User data;
 	Request rqst_data;
 	struct node *next;
@@ -68,7 +67,7 @@ void insertFirst(list *lst, User data)
 {
 	//create a new link
 	Node *link = (Node*)malloc(sizeof(Node));
-	link->data = data;	
+	link->data = data;
 	link->next = NULL;
 	link->prev = NULL;
 
@@ -91,16 +90,13 @@ void insertFirst(list *lst, User data)
 }
 
 //insert link at the last location
-void insertLast(list *lst, User accs_data, Request rqst_data)
+void insertLast(list *lst, User data)
 {
 	//create a new link
 	Node *link = (Node*)malloc(sizeof(Node));
-	if (&accs_data != NULL) {
-		link->data = accs_data;
-	}
-	else {
-		link->rqst_data = rqst_data;
-	}
+
+		link->data = data;
+	
 	link->next = NULL;
 	link->prev = NULL;
 
@@ -121,7 +117,33 @@ void insertLast(list *lst, User accs_data, Request rqst_data)
 
 	free(link);
 }
+void insertLastLog(list *lst, Request data)
+{
+	//create a new link
+	Node *link = (Node*)malloc(sizeof(Node));
 
+	link->rqst_data = data;
+
+	link->next = NULL;
+	link->prev = NULL;
+
+	if (isEmpty(lst))
+	{
+		//make head & tail pointing to link
+		lst->head = lst->tail = link;
+	}
+	else
+	{
+		//make link a new last link
+		lst->tail->next = link;
+		//mark old last node as prev of new link
+		link->prev = lst->tail;
+		//point last to new last node
+		lst->tail = link;
+	}
+
+	free(link);
+}
 //delete first item
 int deleteFirst(list *lst)
 {
@@ -179,7 +201,7 @@ int deleteLink(list *lst, int idx)
 		//start from the first link
 		Node* current = lst->head;
 		//navigate through list
-		for (i = 0; i < idx && current != NULL;i++)
+		for (i = 0; i < idx && current != NULL; i++)
 			current = current->next;
 		if (current == NULL)
 			return 0;
@@ -205,13 +227,13 @@ int insertAfter(list *lst, User data, int idx)
 		Node* current = lst->head;
 		Node *newLink = NULL;
 		//navigate through list
-		for (i = 0; i < idx && current != NULL;i++)
+		for (i = 0; i < idx && current != NULL; i++)
 			current = current->next;
 		if (current == NULL)
 			return 0;
 		if (current == lst->tail)
 		{
-			insertLast(lst, data);
+			insertLast(lst, data,NULL);
 			return 1;
 		}
 		//create a link
@@ -239,7 +261,7 @@ int insertBefore(list *lst, User data, int idx)
 		Node* current = lst->head;
 		Node* newLink = NULL;
 		//navigate through list
-		for (i = 0; i < idx && current != NULL;i++)
+		for (i = 0; i < idx && current != NULL; i++)
 			current = current->next;
 		if (current == NULL)
 			return 0;
@@ -264,7 +286,7 @@ int insertBefore(list *lst, User data, int idx)
 	return 0;
 }
 
-void writeToFile (char *path, list *lst) {
+void writeToFile(char *path, list *lst) {
 	Node *current_node = lst->head;
 	FILE *fp = fopen(path, "wb");
 	char* headers = "Name                 Code     S Start date End date   Stime Etime\r\n";
@@ -285,15 +307,32 @@ void writeToFile (char *path, list *lst) {
 	}
 	fclose(fp);
 }
+// Write each node (user) in the linked list to the  log file
+void writeToLogFile(char *path, list *lst) {
+	Node *current_node = lst->head;
+	FILE *fp = fopen(path, "wb");
+	char* headers = "Name/Code             door Status                date       time\r\n";
 
+	fputs(headers, fp);
+	/*while (current_node != NULL) {
+		fprintf(fp, "%-20s %-4s %-21d %-10s %-5s\r\n",
+			current_node->rqst_data.name_code,
+			current_node->rqst_data.door,
+			current_node->rqst_data.status,
+			current_node->rqst_data.date,
+			current_node->rqst_data.time);
+		current_node = current_node->next;
+	}*/
+	fclose(fp);
+}
 /* Print all the elements in the linked list */
 void print(char *path, list *lst) { //Node *head) {
-	Node *current_node = lst->head;	
-	
+	Node *current_node = lst->head;
+
 	//printf("\nThe current users list:\n%s", headers); //Print headers' line to the console
-	
+
 	while (current_node != NULL) {
-		if (cmpstr(path, "access.txt") == 0) {
+		if (strcmp(path, "access.txt") == 0) {
 			printf("%-20s %-8s %-1d %-10s %-10s %-5s %-5s\n",
 				current_node->data.name,
 				current_node->data.code,
@@ -303,8 +342,17 @@ void print(char *path, list *lst) { //Node *head) {
 				current_node->data.time_s,
 				current_node->data.time_e);
 		}
-		else if (cmpstr(path, "requests.txt") == 0) {
+		else if (strcmp(path, "requests.txt") == 0) {
 			printf("%-1d,%-8s", current_node->rqst_data.door, current_node->rqst_data.name_code);
+		}
+
+		else if (strcmp(path, "log.txt") == 0) {
+			printf("%-20s %-8s %-1d %-10s %-10s %-5s %-5s\n",
+				current_node->rqst_data.name_code,
+				current_node->rqst_data.door,
+				current_node->rqst_data.status,
+				current_node->rqst_data.date,
+				current_node->rqst_data.time);
 		}
 		current_node = current_node->next;
 	}
@@ -326,10 +374,10 @@ void readRequsts(char *path, list *lst) {
 	fgets(temp, 12, fp);
 
 	while (fscanf(fp, "%1s,%8s", &door, code) != EOF) {
-		strcpy(r.code, code);
+		strcpy(r.name_code, code);
 		r.door = door;
 
-		insertLast(lst, r);
+		insertLastLog(lst, r);
 	}
 
 	fclose(fp);
@@ -423,11 +471,11 @@ list *search(char *path, list *lst, char *name, int status, char *code) {
 	}
 
 	while (current_node != NULL) {
-		if (strcmp(current_node->data.name,name) == 0 || current_node->data.status == status || strcmp(current_node->data.code, code) == 0)
+		if (strcmp(current_node->data.name, name) == 0 || current_node->data.status == status || strcmp(current_node->data.code, code) == 0)
 			insertLast(rslt_list, current_node->data);
 		current_node = current_node->next;
 	}
-	
+
 	return rslt_list;
 }
 
@@ -440,7 +488,7 @@ void updateUser(char *path, list *lst, char *name, int status, char *code) {
 	init_list(rslt_list);
 
 	// search the user to update by its NAME
-	if (strcmp(name,"") != 0) {
+	if (strcmp(name, "") != 0) {
 		rslt_list = search(path, lst, name, 0, "");
 		updt_node = rslt_list->head;
 
@@ -481,7 +529,7 @@ void updateUser(char *path, list *lst, char *name, int status, char *code) {
 	{
 		if (strcmp(cmpuser->data.code, updt_node->data.code) == 0) {
 			insertBefore(lst, updt_node->data, count);
-			deleteLink(lst, count+1);
+			deleteLink(lst, count + 1);
 			check = 1;
 			break;
 		}
