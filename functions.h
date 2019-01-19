@@ -16,10 +16,19 @@ typedef struct user_data
 	int status;
 }User;
 
-typedef struct node
+typedef struct user_request
 {
-	//list_type value;	
+	char name_code[21];
+	char date[11];
+	char time[5];
+	char status[22];
+	int door;
+}Request;
+
+typedef struct node
+{	
 	User data;
+	Request rqst_data;
 	struct node *next;
 	struct node *prev;
 }Node;
@@ -30,16 +39,19 @@ typedef struct list
 	Node *tail;
 }list;
 
+// Initiate list head & tail to NULL
 void init_list(list *lst)
 {
 	lst->head = lst->tail = NULL;
 }
 
+// Check if the list is empty
 int isEmpty(list *lst)
 {
 	return lst->head == NULL;
 }
 
+// Check the length of the link
 int length(list *lst)
 {
 	int length = 0;
@@ -56,7 +68,7 @@ void insertFirst(list *lst, User data)
 {
 	//create a new link
 	Node *link = (Node*)malloc(sizeof(Node));
-	link->data = data;
+	link->data = data;	
 	link->next = NULL;
 	link->prev = NULL;
 
@@ -78,11 +90,17 @@ void insertFirst(list *lst, User data)
 	free(link);
 }
 
-void insertLast(list *lst, User data)
+//insert link at the last location
+void insertLast(list *lst, User accs_data, Request rqst_data)
 {
 	//create a new link
 	Node *link = (Node*)malloc(sizeof(Node));
-	link->data = data;
+	if (&accs_data != NULL) {
+		link->data = accs_data;
+	}
+	else {
+		link->rqst_data = rqst_data;
+	}
 	link->next = NULL;
 	link->prev = NULL;
 
@@ -251,7 +269,9 @@ void writeToFile (char *path, list *lst) {
 	FILE *fp = fopen(path, "wb");
 	char* headers = "Name                 Code     S Start date End date   Stime Etime\r\n";
 
-	fputs(headers, fp);
+	fputs(headers, fp); // Write the headers line to the file
+
+	// Write each node (user) in the linked list to the file
 	while (current_node != NULL) {
 		fprintf(fp, "%-20s %-8s %-1d %-10s %-10s %-5s %-5s\r\n",
 			current_node->data.name,
@@ -265,6 +285,7 @@ void writeToFile (char *path, list *lst) {
 	}
 	fclose(fp);
 }
+
 /* Print all the elements in the linked list */
 void print(char *path, list *lst) { //Node *head) {
 	Node *current_node = lst->head;	
@@ -272,16 +293,47 @@ void print(char *path, list *lst) { //Node *head) {
 	//printf("\nThe current users list:\n%s", headers); //Print headers' line to the console
 	
 	while (current_node != NULL) {
-		printf("%-20s %-8s %-1d %-10s %-10s %-5s %-5s\n",
-			current_node->data.name,
-			current_node->data.code,
-			current_node->data.status,
-			current_node->data.date_s,
-			current_node->data.date_e,
-			current_node->data.time_s,
-			current_node->data.time_e);		
+		if (cmpstr(path, "access.txt") == 0) {
+			printf("%-20s %-8s %-1d %-10s %-10s %-5s %-5s\n",
+				current_node->data.name,
+				current_node->data.code,
+				current_node->data.status,
+				current_node->data.date_s,
+				current_node->data.date_e,
+				current_node->data.time_s,
+				current_node->data.time_e);
+		}
+		else if (cmpstr(path, "requests.txt") == 0) {
+			printf("%-1d,%-8s", current_node->rqst_data.door, current_node->rqst_data.name_code);
+		}
 		current_node = current_node->next;
 	}
+}
+
+void readRequsts(char *path, list *lst) {
+	FILE *fp;
+	char temp[12], code[8];
+	int door;
+	Request r;
+
+	fp = fopen(path, "rb"); //Reads all the data from the file and put it in fp
+	if (!fp)
+	{
+		printf("File not found!\n");
+		return;
+	}
+
+	fgets(temp, 12, fp);
+
+	while (fscanf(fp, "%1s,%8s", &door, code) != EOF) {
+		strcpy(r.code, code);
+		r.door = door;
+
+		insertLast(lst, r);
+	}
+
+	fclose(fp);
+	return lst;
 }
 
 void readAccess(char *path, list *lst) // Node *head) // 
