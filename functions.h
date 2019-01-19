@@ -86,7 +86,7 @@ void insertFirst(list *lst, User data)
 		lst->head = link;
 	}
 
-	free(link);
+	//free(link);
 }
 
 //insert link at the last location
@@ -94,9 +94,7 @@ void insertLast(list *lst, User data)
 {
 	//create a new link
 	Node *link = (Node*)malloc(sizeof(Node));
-
-		link->data = data;
-	
+	link->data = data;
 	link->next = NULL;
 	link->prev = NULL;
 
@@ -115,7 +113,7 @@ void insertLast(list *lst, User data)
 		lst->tail = link;
 	}
 
-	free(link);
+	//free(link);
 }
 void insertLastLog(list *lst, Request data)
 {
@@ -142,7 +140,7 @@ void insertLastLog(list *lst, Request data)
 		lst->tail = link;
 	}
 
-	free(link);
+	//free(link);
 }
 //delete first item
 int deleteFirst(list *lst)
@@ -246,7 +244,7 @@ int insertAfter(list *lst, User data, int idx)
 		current->next->prev = newLink;
 		current->next = newLink;
 
-		free(newLink);
+		//free(newLink);
 		return 1;
 	}
 	return 0;
@@ -280,7 +278,7 @@ int insertBefore(list *lst, User data, int idx)
 		current->prev->next = newLink;
 		current->prev = newLink;
 
-		free(newLink);
+		//free(newLink);
 		return 1;
 	}
 	return 0;
@@ -288,14 +286,14 @@ int insertBefore(list *lst, User data, int idx)
 
 void writeToFile(char *path, list *lst) {
 	Node *current_node = lst->head;
-	FILE *fp = fopen(path, "wb");
+	FILE *fp = fopen(path, "w");
 	char* headers = "Name                 Code     S Start date End date   Stime Etime\r\n";
 
 	fputs(headers, fp); // Write the headers line to the file
 
 	// Write each node (user) in the linked list to the file
 	while (current_node != NULL) {
-		fprintf(fp, "%-20s %-8s %-1d %-10s %-10s %-5s %-5s\r\n",
+		fprintf(fp, "%-20s %-8s %-1d %-10s %-10s %-5s %-5s\n",
 			current_node->data.name,
 			current_node->data.code,
 			current_node->data.status,
@@ -328,8 +326,8 @@ void writeToLogFile(char *path, list *lst) {
 /* Print all the elements in the linked list */
 void print(char *path, list *lst) { //Node *head) {
 	Node *current_node = lst->head;
-
-	//printf("\nThe current users list:\n%s", headers); //Print headers' line to the console
+	char* headers = "Name                 Code     S Start date End date   Stime Etime\r\n";
+	printf("\nThe current users list:\n%s", headers); //Print headers line to the console
 
 	while (current_node != NULL) {
 		if (strcmp(path, "access.txt") == 0) {
@@ -342,12 +340,11 @@ void print(char *path, list *lst) { //Node *head) {
 				current_node->data.time_s,
 				current_node->data.time_e);
 		}
-		else if (strcmp(path, "requests.txt") == 0) {
+		else if (strcmp(path, "requests.txt") == 0) 
 			printf("%-1d,%-8s", current_node->rqst_data.door, current_node->rqst_data.name_code);
-		}
 
 		else if (strcmp(path, "log.txt") == 0) {
-			printf("%-20s %-8s %-1d %-10s %-10s %-5s %-5s\n",
+			printf("%-20s %-4s %-21d %-10s %-5s\n",
 				current_node->rqst_data.name_code,
 				current_node->rqst_data.door,
 				current_node->rqst_data.status,
@@ -364,16 +361,16 @@ void readRequsts(char *path, list *lst) {
 	int door;
 	Request r;
 
-	fp = fopen(path, "rb"); //Reads all the data from the file and put it in fp
+	fp = fopen(path, "r"); //Reads all the data from the file and put it in fp
 	if (!fp)
 	{
 		printf("File not found!\n");
 		return;
 	}
 
-	fgets(temp, 12, fp);
+	//fgets(temp, 12, fp);
 
-	while (fscanf(fp, "%1s,%8s", &door, code) != EOF) {
+	while (fscanf(fp, "%1d,%6s", &door, code) != EOF) {
 		strcpy(r.name_code, code);
 		r.door = door;
 
@@ -381,7 +378,7 @@ void readRequsts(char *path, list *lst) {
 	}
 
 	fclose(fp);
-	return lst;
+	//return lst;
 }
 
 void readAccess(char *path, list *lst) // Node *head) // 
@@ -396,7 +393,7 @@ void readAccess(char *path, list *lst) // Node *head) //
 
 	User d;
 
-	fp = fopen(path, "rb"); //Reads all the data from the file and put it in fp
+	fp = fopen(path, "r"); //Reads all the data from the file and put it in fp
 	if (!fp)
 	{
 		printf("File not found!\n");
@@ -420,7 +417,6 @@ void readAccess(char *path, list *lst) // Node *head) //
 	}
 	//print(lst);
 	fclose(fp);
-	return lst;
 }
 
 void AddUser(list *new)
@@ -465,17 +461,21 @@ list *search(char *path, list *lst, char *name, int status, char *code) {
 	Node *current_node = lst->head;
 	list *rslt_list = (list *)malloc(sizeof(list));
 	init_list(rslt_list);
-
+	//int check = 0;
 	if (isEmpty(lst)) {
 		return;
 	}
 
 	while (current_node != NULL) {
-		if (strcmp(current_node->data.name, name) == 0 || current_node->data.status == status || strcmp(current_node->data.code, code) == 0)
+		if (strcmp(current_node->data.name, name) == 0 || current_node->data.status == status || strcmp(current_node->data.code, code) == 0) {
 			insertLast(rslt_list, current_node->data);
+			//check ++;
+		}
+			
 		current_node = current_node->next;
 	}
-
+	//if (check == 0)
+		//return 0;
 	return rslt_list;
 }
 
@@ -496,9 +496,16 @@ void updateUser(char *path, list *lst, char *name, int status, char *code) {
 		if (status == 0) {
 			printf("Enter new START and END date, START and END time (dd/mm/yyyy hh:mm) for user %s: ", name);
 			scanf("%s %s %s %s", updt_node->data.date_s, updt_node->data.date_e, updt_node->data.time_s, updt_node->data.time_e);
-			printf("%s %s %s %s", updt_node->data.date_s, updt_node->data.date_e, updt_node->data.time_s, updt_node->data.time_e);
+			printf("User details after the changes:\n%-20s %-8s %-1d %-10s %-10s %-5s %-5s\n", 
+				updt_node->data.name,
+				updt_node->data.code,
+				updt_node->data.status,
+				updt_node->data.date_s,
+				updt_node->data.date_e,
+				updt_node->data.time_s,
+				updt_node->data.time_e);
 		}
-
+		
 		// update user's permissions STATUS
 		else {
 			updt_node->data.status = status;
@@ -514,7 +521,14 @@ void updateUser(char *path, list *lst, char *name, int status, char *code) {
 		if (status == 0) {
 			printf("Enter new START and END date, START and END time (dd/mm/yyyy hh:mm) for user %s: ", name);
 			scanf("%s %s %s %s", updt_node->data.date_s, updt_node->data.date_e, updt_node->data.time_s, updt_node->data.time_e);
-			printf("%s %s %s %s", updt_node->data.date_s, updt_node->data.date_e, updt_node->data.time_s, updt_node->data.time_e);
+			printf("User details after the changes %-20s %-8s %-1d %-10s %-10s %-5s %-5s\n",
+				updt_node->data.name,
+				updt_node->data.code,
+				updt_node->data.status,
+				updt_node->data.date_s,
+				updt_node->data.date_e,
+				updt_node->data.time_s,
+				updt_node->data.time_e);
 		}
 
 		// update user's permissions STATUS

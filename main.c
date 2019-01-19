@@ -5,14 +5,17 @@
 #define ACCESS_PATH "access.txt"
 /***
 * This is the path where the access file is located.
-* When you submit the program make sure this path match to: "c:\\temp\\access.txt"
+* When you submit the program make sure this path match to: "access.txt"
 ***/
-
+#define REAQUESTS_PATH "requests.txt"
+/***
+* This is the path where the requests file is located.
+* When you submit the program make sure this path match to: "requests.txt"
+***/
 #define LOG_PATH "log.txt"
 /***
 * This is the path where the log file is located.
-* Open this file and append new records into it.
-* When you submit the program make sure this path match to: "c:\\temp\\log.txt"
+* When you submit the program make sure this path match to: "log.txt"
 ***/
 
 void getDateTime(int *day, int *month, int *year, int *hours, int *mins)
@@ -36,37 +39,44 @@ void getDateTime(int *day, int *month, int *year, int *hours, int *mins)
 void main() {
 	list *lst = (list *)malloc(sizeof(list));
 	list *srch_list = (list *)malloc(sizeof(list));
-	list *test =(list * )malloc(sizeof(list));
+	list *loglst =(list *)malloc(sizeof(list));
+	list *rqstlst =(list *)malloc(sizeof(list));
 	int option, action, srch_status;
-	char *temp;
+	// *temp;
 	char *updt_name = (char*)malloc(sizeof(char));
 	char srch_name[21], srch_code[9];
-
+	
 	init_list(lst);
 	init_list(srch_list);
-	init_list(test);
+	init_list(loglst);
+	init_list(rqstlst);
 	readAccess(ACCESS_PATH, lst);
-	writeToLogFile(LOG_PATH, test);
+	//print(ACCESS_PATH, lst);
+	readRequsts(REAQUESTS_PATH, rqstlst);
+	//print(REAQUESTS_PATH, rqstlst);
+	writeToLogFile(LOG_PATH, loglst);
 	/* Display Menu */
 	while (1) {
 		// Operations menu
 		{
-			printf("\n *************\n");
-			printf("\n *  Linked list operations:        *\n");
-			printf("\n *  1. SEARCH USER/STATUS   *\n");
-			printf("\n *  2. ADD NEW USER    *\n");
-			printf("\n *  3. UPDATE USER'S PERMISSIONS     *\n");
-			printf("\n *  4.     *\n");
-			printf("\n *  5.            *\n");
-			printf("\n *  6. Quit                        *\n");
-			printf("\n *************\n");
-			printf("\n Choose an option [1-5]. Exit [6]: ");
+			printf("\n *  *  *  *  *  *  *  *  *  *  *  *  *\n");
+			printf("\n *  Operations menu                  *\n");
+			printf("\n *  1. Search for user               *\n");
+			printf("\n *  2. Add new user                  *\n");
+			printf("\n *  3. Update user permissions       *\n");
+			printf("\n *  4. Print log file                *\n");
+			printf("\n *  5. Print user list (acsess.txt)  *\n");
+			printf("\n *  6. Check security system         *\n");
+			printf("\n *  7. Quit                          *\n");
+			printf("\n *  *  *  *  *  *  *  *  *  *  *  *  *\n");
+			printf("\n Please select your action [1-6]. Exit [7]:");
 		}
-		if (scanf("%d", &option) != 1) {
+		/*if (scanf("%d", &option) != 1) {
 			printf(" *Error: Invalid input. Try again.\n");
 			scanf("%s", &temp); //clear input buffer
 			continue;
-		}
+		}*/
+		scanf("%d", &option);
 		switch (option) {
 
 			// Search for user by its name(s) (1) or ststus (2) or code (3)
@@ -105,6 +115,7 @@ void main() {
 			AddUser(lst);
 			writeToFile(ACCESS_PATH, lst);
 			print(ACCESS_PATH, lst);
+
 			break;
 		}
 
@@ -163,42 +174,24 @@ void main() {
 
 			break;
 		}
-
-				/*		case 4:    // Insert Before
-							printf(" Enter a number to insert : ");
-							if (scanf("%d", &num) != 1) {
-								printf(" *Error: Invalid input. \n");
-								scanf("%s", &temp);
-								continue;
-							}
-							printf(" Before which number do you want to insert : ");
-							if (scanf("%d", &prev_num) != 1) {
-								printf(" *Error: Invalid input.\n");
-								scanf("%s", &temp);
-								continue;
-							}
-							if (head != NULL) {
-								head = insert_before(num, prev_num, head);
-								printf("Number %d inserted before %d", num, prev_num);
-							}
-							else {
-								printf("The list is empty", num, prev_num);
-							}
-							printf("\nPress any key to continue...");
-							getch();
-							break;
-						case 5: // Show all elements
-							printf("\nElements in the list: \n [ ");
-							print(head);
-							printf("]\n\nPress any key to continue...");
-							getch();
-							break;*/
-		case 6:  // Exit
+		case 4:
+			print(LOG_PATH, loglst);
+			break;		
+		case 5: 
+			print(ACCESS_PATH, lst);
+			break;
+		case 6: {
+			
+		}
+		case 7: {// Exit
 			free(lst);
 			free(srch_list);
+			free(rqstlst);
+			free(loglst);
 			free(updt_name);
 			return(0);
 			break;
+		}
 		default:
 			printf("Invalid Option. Please Try again.");
 			getch();
@@ -206,5 +199,5 @@ void main() {
 	} // End of While
 	return(0);
 
-	//system("pause");
+	system("pause");
 }
