@@ -74,6 +74,8 @@ void insertFirst(list *lst, User data)
 		//point first to new first link
 		lst->head = link;
 	}
+
+	free(link);
 }
 
 void insertLast(list *lst, User data)
@@ -98,6 +100,8 @@ void insertLast(list *lst, User data)
 		//point last to new last node
 		lst->tail = link;
 	}
+
+	free(link);
 }
 
 //delete first item
@@ -201,6 +205,8 @@ int insertAfter(list *lst, User data, int idx)
 		//chain current and current->next to new link
 		current->next->prev = newLink;
 		current->next = newLink;
+
+		free(newLink);
 		return 1;
 	}
 	return 0;
@@ -233,6 +239,8 @@ int insertBefore(list *lst, User data, int idx)
 		//chain current and current->prev to new link
 		current->prev->next = newLink;
 		current->prev = newLink;
+
+		free(newLink);
 		return 1;
 	}
 	return 0;
@@ -349,6 +357,8 @@ void AddUser(list *new)
 	}
 	if (check == 0)
 		insertLast(new, newuser->data);
+
+	free(newuser);
 }
 
 list *search(char *path, list *lst, char *name, int status, char *code) {
@@ -365,9 +375,9 @@ list *search(char *path, list *lst, char *name, int status, char *code) {
 			insertLast(rslt_list, current_node->data);
 		current_node = current_node->next;
 	}
-	//print(path, rslt_list);
+	
 	return rslt_list;
-	}
+}
 
 void updateUser(char *path, list *lst, char *name, int status, char *code) {
 	int count, check;
@@ -375,35 +385,51 @@ void updateUser(char *path, list *lst, char *name, int status, char *code) {
 	list *rslt_list = (list *)malloc(sizeof(list));
 	Node *updt_node;
 	Node *cmpuser = lst->head;
-	User d;
 	init_list(rslt_list);
 
-	if (name) {
+	// search the user to update by its NAME
+	if (strcmp(name,"") != 0) {
+		rslt_list = search(path, lst, name, 0, "");
+		updt_node = rslt_list->head;
+
+		// update user's TIME-RANGE permissions
 		if (status == 0) {
 			printf("Enter new START and END date, START and END time (dd/mm/yyyy hh:mm) for user %s: ", name);
-			scanf("%s %s %s %s", date_s, date_e, time_s, time_e);
-			printf("%s %s %s %s", date_s, date_e, time_s, time_e);
+			scanf("%s %s %s %s", updt_node->data.date_s, updt_node->data.date_e, updt_node->data.time_s, updt_node->data.time_e);
+			printf("%s %s %s %s", updt_node->data.date_s, updt_node->data.date_e, updt_node->data.time_s, updt_node->data.time_e);
+		}
 
-			rslt_list = search(path, lst, name, 0, "");
-			updt_node = rslt_list->head;
-
-			strcpy(d.name, updt_node->data.name);
-			strcpy(d.code, updt_node->data.code);
-			d.status = updt_node->data.status;
-			strcpy(d.date_s, date_s);
-			strcpy(d.date_e, date_e);
-			strcpy(d.time_s, date_s);
-			strcpy(d.time_e, date_e);
-
+		// update user's permissions STATUS
+		else {
+			updt_node->data.status = status;
 		}
 	}
 
+	// search the user to update by its CODE
+	else {
+		rslt_list = search(path, lst, "", 0, code);
+		updt_node = rslt_list->head;
+
+		// update user's TIME-RANGE permissions
+		if (status == 0) {
+			printf("Enter new START and END date, START and END time (dd/mm/yyyy hh:mm) for user %s: ", name);
+			scanf("%s %s %s %s", updt_node->data.date_s, updt_node->data.date_e, updt_node->data.time_s, updt_node->data.time_e);
+			printf("%s %s %s %s", updt_node->data.date_s, updt_node->data.date_e, updt_node->data.time_s, updt_node->data.time_e);
+		}
+
+		// update user's permissions STATUS
+		else {
+			updt_node->data.status = status;
+		}
+	}
+
+	// insert the updated user to the linked list instead of the old one and write the new list the access.txt
 	count = check = 0;
 	while (cmpuser != NULL)
 	{
 		if (strcmp(cmpuser->data.code, updt_node->data.code) == 0) {
 			insertBefore(lst, updt_node->data, count);
-			deleteLink(lst, count);
+			deleteLink(lst, count+1);
 			check = 1;
 			break;
 		}
@@ -414,6 +440,7 @@ void updateUser(char *path, list *lst, char *name, int status, char *code) {
 		insertLast(lst, updt_node->data);
 
 	writeToFile(path, lst);
+	free(rslt_list);
 }
 
 int countLines(FILE *fp)

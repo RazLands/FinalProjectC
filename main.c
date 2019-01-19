@@ -36,8 +36,8 @@ void getDateTime(int *day, int *month, int *year, int *hours, int *mins)
 void main() {
 	list *lst = (list *)malloc(sizeof(list));
 	list *srch_list = (list *)malloc(sizeof(list));
-	int option, action, srch_status, result;
-	char *temp = (char*)malloc(sizeof(char));;
+	int option, action, srch_status;
+	char *temp;
 	char *updt_name = (char*)malloc(sizeof(char));
 	char srch_name[21], srch_code[9];
 
@@ -47,16 +47,19 @@ void main() {
 
 	/* Display Menu */
 	while (1) {
-		printf("\n *************\n");
-		printf("\n *  Linked list operations:        *\n");
-		printf("\n *  1. SEARCH USER/STATUS   *\n");
-		printf("\n *  2. ADD NEW USER    *\n");
-		printf("\n *  3.      *\n");
-		printf("\n *  4.     *\n");
-		printf("\n *  5.            *\n");
-		printf("\n *  6. Quit                        *\n");
-		printf("\n *************\n");
-		printf("\n Choose an option [1-5]. Exit [6]: ");
+		// Operations menu
+		{
+			printf("\n *************\n");
+			printf("\n *  Linked list operations:        *\n");
+			printf("\n *  1. SEARCH USER/STATUS   *\n");
+			printf("\n *  2. ADD NEW USER    *\n");
+			printf("\n *  3. UPDATE USER'S PERMISSIONS     *\n");
+			printf("\n *  4.     *\n");
+			printf("\n *  5.            *\n");
+			printf("\n *  6. Quit                        *\n");
+			printf("\n *************\n");
+			printf("\n Choose an option [1-5]. Exit [6]: ");
+		}
 		if (scanf("%d", &option) != 1) {
 			printf(" *Error: Invalid input. Try again.\n");
 			scanf("%s", &temp); //clear input buffer
@@ -64,7 +67,7 @@ void main() {
 		}
 		switch (option) {
 		
-		// Search for user by its name(s) (type 1) or ststus (type 2)
+		// Search for user by its name(s) (1) or ststus (2) or code (3)
 		case 1:  {      
 			printf("Choose searching by user NAME (1) or STATUS (2) or CODE (3): ");
 			scanf("%d", &action);
@@ -122,17 +125,17 @@ void main() {
 				scanf("%s", srch_name);
 
 				printf("Choose which paramet to update: STATUS (1), TIME RANGE (2): ");
-				scanf("%d", &action);
+				scanf("%d", &option);
 
 				// Find user by its NAME and update his permissions status 
-				if (action == 1) {
+				if (option == 1) {
 					printf("Enter the new status permission for user %s: ", srch_name);
 					scanf("%d", &srch_status);
 					updateUser(ACCESS_PATH, lst, srch_name, srch_status, "");
 				}
 
 				// Find user by its NAME and update user's date and time range permission
-				if (action == 2) {
+				if (option == 2) {
 					updateUser(ACCESS_PATH, lst, srch_name, 0, "");
 				}
 			}
@@ -142,20 +145,19 @@ void main() {
 				printf("Enter a user CODE to update: ");
 				scanf("%s", srch_code);
 				printf("Choose which paramet to update: STATUS (1), TIME RANGE (2): ");
+				scanf("%d", &option);
 
 				// Find user by its NAME and update his permissions status 
-				if (scanf("%d", &action) == 1) {
-					printf("Enter the new status permission for user %s: ", srch_name);
+				if (option == 1) {
+					printf("Enter the new status permission for user code %s: ", srch_code);
 					scanf("%d", &srch_status);
 					updateUser(ACCESS_PATH, lst, "", srch_status, srch_code);
 				}
 				// Find user by its NAME and update user's date and time range permission
-				if (scanf("%d", &action) == 2) {
+				if (option == 2) {
 					updateUser(ACCESS_PATH, lst, "", 0, srch_code);
 				}
 			}
-
-
 
 			break;
 		}
@@ -190,6 +192,9 @@ void main() {
 			getch();
 			break;*/
 		case 6:  // Exit
+			free(lst);
+			free(srch_list);
+			free(updt_name);
 			return(0);
 			break;
 		default:
