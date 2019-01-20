@@ -37,24 +37,24 @@ void getDateTime(int *day, int *month, int *year, int *hours, int *mins)
 }
 
 void main() {
-	list *lst = (list *)malloc(sizeof(list));
-	list *srch_list = (list *)malloc(sizeof(list));
-	list *loglst =(list *)malloc(sizeof(list));
-	list *rqstlst =(list *)malloc(sizeof(list));
+	list *accs_lst = (list *)malloc(sizeof(list));
+	list *srch_list = (list*)malloc(sizeof(list));
+	list *log_lst = (list*)malloc(sizeof(list));
+	list *rqst_lst = (list*)malloc(sizeof(list));
 	int option, action, srch_status;
 	// *temp;
 	char *updt_name = (char*)malloc(sizeof(char));
 	char srch_name[21], srch_code[9];
-	
-	init_list(lst);
+
+	init_list(accs_lst);
 	init_list(srch_list);
-	init_list(loglst);
-	init_list(rqstlst);
-	readAccess(ACCESS_PATH, lst);
-	//print(ACCESS_PATH, lst);
-	readRequsts(REAQUESTS_PATH, rqstlst);
-	print(REAQUESTS_PATH, rqstlst);
-	writeToLogFile(LOG_PATH, loglst);
+	init_list(log_lst);
+	init_list(rqst_lst);
+	readAccess(ACCESS_PATH, accs_lst);
+	//print(ACCESS_PATH, accs_lst);
+	readRequsts(REAQUESTS_PATH, rqst_lst);
+	print(REAQUESTS_PATH, rqst_lst);
+	writeToLogFile(LOG_PATH, log_lst);
 	/* Display Menu */
 	while (1) {
 		// Operations menu
@@ -79,7 +79,7 @@ void main() {
 		scanf("%d", &option);
 		switch (option) {
 
-			// Search for user by its name(s) (1) or ststus (2) or code (3)
+		// Search for user by its name(s) (1) or ststus (2) or code (3)
 		case 1: {
 			printf("Choose searching by user NAME (1) or STATUS (2) or CODE (3): ");
 			scanf("%d", &action);
@@ -88,7 +88,7 @@ void main() {
 			if (action == 1) {
 				printf("Enter the NAME you want to search for: ");
 				scanf("%20s", srch_name);
-				srch_list = search(ACCESS_PATH, lst, srch_name, 0, "");
+				srch_list = search(ACCESS_PATH, accs_lst, srch_name, 0, "");
 				print(ACCESS_PATH, srch_list);
 			}
 
@@ -96,7 +96,7 @@ void main() {
 			else if (action == 2) {
 				printf("Enter the STATUS you want to search for: ");
 				scanf("%d", &srch_status);
-				srch_list = search(ACCESS_PATH, lst, "", srch_status, "");
+				srch_list = search(ACCESS_PATH, accs_lst, "", srch_status, "");
 				print(ACCESS_PATH, srch_list);
 			}
 
@@ -104,29 +104,29 @@ void main() {
 			else if (action == 3) {
 				printf("Enter the CODE you want to search for: ");
 				scanf("%8s", &srch_code);
-				srch_list = search(ACCESS_PATH, lst, "", 0, srch_code);
+				srch_list = search(ACCESS_PATH, accs_lst, "", 0, srch_code);
 				print(ACCESS_PATH, srch_list);
 			}
 			break;
 		}
 
-				// add new user
+		// add new user
 		case 2: {
-			AddUser(lst);
-			writeToFile(ACCESS_PATH, lst);
-			print(ACCESS_PATH, lst);
+			AddUser(accs_lst);
+			writeToFile(ACCESS_PATH, accs_lst);
+			print(ACCESS_PATH, accs_lst);
 
 			break;
 		}
 
-				// Update user's permissions
+		// Update user's permissions
 		case 3: {
 			printf("Type '1' (name) or '2' (code) to choose which user to update. Type '3' to see current users list: ");
 			scanf("%d", &action);
 
 			// Print the current users list to the console
 			if (action == 3) {
-				print(ACCESS_PATH, lst);
+				print(ACCESS_PATH, accs_lst);
 				//getch();
 				printf("Type '1' (name) or '2' (code) to choose which user to update: ");
 				scanf("%d", &action);
@@ -144,12 +144,12 @@ void main() {
 				if (option == 1) {
 					printf("Enter the new status permission for user %s: ", srch_name);
 					scanf("%d", &srch_status);
-					updateUser(ACCESS_PATH, lst, srch_name, srch_status, "");
+					updateUser(ACCESS_PATH, accs_lst, srch_name, srch_status, "");
 				}
 
 				// Find user by its NAME and update user's date and time range permission
 				if (option == 2) {
-					updateUser(ACCESS_PATH, lst, srch_name, 0, "");
+					updateUser(ACCESS_PATH, accs_lst, srch_name, 0, "");
 				}
 			}
 
@@ -164,30 +164,40 @@ void main() {
 				if (option == 1) {
 					printf("Enter the new status permission for user code %s: ", srch_code);
 					scanf("%d", &srch_status);
-					updateUser(ACCESS_PATH, lst, "", srch_status, srch_code);
+					updateUser(ACCESS_PATH, accs_lst, "", srch_status, srch_code);
 				}
 				// Find user by its NAME and update user's date and time range permission
 				if (option == 2) {
-					updateUser(ACCESS_PATH, lst, "", 0, srch_code);
+					updateUser(ACCESS_PATH, accs_lst, "", 0, srch_code);
 				}
 			}
 
 			break;
 		}
-		case 4:
-			print(LOG_PATH, loglst);
-			break;		
-		case 5: 
-			print(ACCESS_PATH, lst);
+
+		// Print log file to the console
+		case 4: {
+			print(LOG_PATH, log_lst);
 			break;
-		case 6: {
-			
 		}
+
+		// Print access file to the console
+		case 5: {
+			print(ACCESS_PATH, accs_lst);
+			break;
+		}
+
+		case 6: {
+			return(0);
+			break;
+		}
+
+		// Exit program
 		case 7: {// Exit
-			free(lst);
+			free(accs_lst);
 			free(srch_list);
-			free(rqstlst);
-			free(loglst);
+			free(rqst_lst);
+			free(log_lst);
 			free(updt_name);
 			return(0);
 			break;
