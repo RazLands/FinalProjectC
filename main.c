@@ -53,7 +53,7 @@ void main() {
 	readAccess(ACCESS_PATH, lst);
 	//print(ACCESS_PATH, lst);
 	readRequsts(REAQUESTS_PATH, rqstlst);
-	//print(REAQUESTS_PATH, rqstlst);
+	print(REAQUESTS_PATH, rqstlst);
 	writeToLogFile(LOG_PATH, loglst);
 	/* Display Menu */
 	while (1) {

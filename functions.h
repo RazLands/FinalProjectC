@@ -326,9 +326,13 @@ void writeToLogFile(char *path, list *lst) {
 /* Print all the elements in the linked list */
 void print(char *path, list *lst) { //Node *head) {
 	Node *current_node = lst->head;
-	char* headers = "Name                 Code     S Start date End date   Stime Etime\r\n";
-	printf("\nThe current users list:\n%s", headers); //Print headers line to the console
-
+	char* userheaders = "Name                 Code     S Start date End date   Stime Etime\n";
+	char* logheaders = "Name / Code             door Status                date       time\n";
+	if (strcmp(path, "access.txt") == 0)
+	printf("\nThe current users list:\n%s", userheaders); //Print headers line to the console
+	
+	if (strcmp(path, "log.txt") == 0)
+		printf("\nThe current entry log:\n%s", logheaders); //Print headers line to the console
 	while (current_node != NULL) {
 		if (strcmp(path, "access.txt") == 0) {
 			printf("%-20s %-8s %-1d %-10s %-10s %-5s %-5s\n",
@@ -341,7 +345,7 @@ void print(char *path, list *lst) { //Node *head) {
 				current_node->data.time_e);
 		}
 		else if (strcmp(path, "requests.txt") == 0) 
-			printf("%-1d,%-8s", current_node->rqst_data.door, current_node->rqst_data.name_code);
+			printf("%-1d,%-8s\n", current_node->rqst_data.door, current_node->rqst_data.name_code);
 
 		else if (strcmp(path, "log.txt") == 0) {
 			printf("%-20s %-4s %-21d %-10s %-5s\n",
@@ -356,13 +360,13 @@ void print(char *path, list *lst) { //Node *head) {
 }
 
 void readRequsts(char *path, list *lst) {
-	FILE *fp;
-	char temp[12], code[8];
+	FILE *fp1;
+	char temp[12], code[21];
 	int door;
 	Request r;
 
-	fp = fopen(path, "r"); //Reads all the data from the file and put it in fp
-	if (!fp)
+	fp1 = fopen(path, "rb"); //Reads all the data from the file and put it in fp
+	if (!fp1)
 	{
 		printf("File not found!\n");
 		return;
@@ -370,14 +374,14 @@ void readRequsts(char *path, list *lst) {
 
 	//fgets(temp, 12, fp);
 
-	while (fscanf(fp, "%1d,%6s", &door, code) != EOF) {
+	while (fscanf(fp1, "%1d,%20s", &door, code) != EOF) {
 		strcpy(r.name_code, code);
 		r.door = door;
 
 		insertLastLog(lst, r);
 	}
 
-	fclose(fp);
+	fclose(fp1);
 	//return lst;
 }
 
