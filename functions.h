@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
-
+#include <time.h>
 /* Node Stucture */
 typedef char list_type;
 
@@ -16,10 +16,19 @@ typedef struct user_data
 	int status;
 }User;
 
+typedef struct user_request
+{
+	char name_code[21];
+	char date[11];
+	char time[5];
+	char status[22];
+	int door;
+}Request;
+
 typedef struct node
 {
-	//list_type value;	
 	User data;
+	Request rqst_data;
 	struct node *next;
 	struct node *prev;
 }Node;
@@ -30,16 +39,19 @@ typedef struct list
 	Node *tail;
 }list;
 
+// Initiate list head & tail to NULL
 void init_list(list *lst)
 {
 	lst->head = lst->tail = NULL;
 }
 
+// Check if the list is empty
 int isEmpty(list *lst)
 {
 	return lst->head == NULL;
 }
 
+// Check the length of the link
 int length(list *lst)
 {
 	int length = 0;
@@ -75,9 +87,10 @@ void insertFirst(list *lst, User data)
 		lst->head = link;
 	}
 
-	free(link);
+	//free(link);
 }
 
+//insert link at the last location
 void insertLast(list *lst, User data)
 {
 	//create a new link
@@ -101,7 +114,35 @@ void insertLast(list *lst, User data)
 		lst->tail = link;
 	}
 
-	free(link);
+	//free(link);
+}
+
+void insertLastLog(list *lst, Request data)
+{
+	//create a new link
+	Node *link = (Node*)malloc(sizeof(Node));
+
+	link->rqst_data = data;
+
+	link->next = NULL;
+	link->prev = NULL;
+
+	if (isEmpty(lst))
+	{
+		//make head & tail pointing to link
+		lst->head = lst->tail = link;
+	}
+	else
+	{
+		//make link a new last link
+		lst->tail->next = link;
+		//mark old last node as prev of new link
+		link->prev = lst->tail;
+		//point last to new last node
+		lst->tail = link;
+	}
+
+	//free(link);
 }
 
 //delete first item
@@ -161,7 +202,7 @@ int deleteLink(list *lst, int idx)
 		//start from the first link
 		Node* current = lst->head;
 		//navigate through list
-		for (i = 0; i < idx && current != NULL;i++)
+		for (i = 0; i < idx && current != NULL; i++)
 			current = current->next;
 		if (current == NULL)
 			return 0;
@@ -187,13 +228,13 @@ int insertAfter(list *lst, User data, int idx)
 		Node* current = lst->head;
 		Node *newLink = NULL;
 		//navigate through list
-		for (i = 0; i < idx && current != NULL;i++)
+		for (i = 0; i < idx && current != NULL; i++)
 			current = current->next;
 		if (current == NULL)
 			return 0;
 		if (current == lst->tail)
 		{
-			insertLast(lst, data);
+			insertLast(lst, data,NULL);
 			return 1;
 		}
 		//create a link
@@ -206,7 +247,7 @@ int insertAfter(list *lst, User data, int idx)
 		current->next->prev = newLink;
 		current->next = newLink;
 
-		free(newLink);
+		//free(newLink);
 		return 1;
 	}
 	return 0;
@@ -221,7 +262,7 @@ int insertBefore(list *lst, User data, int idx)
 		Node* current = lst->head;
 		Node* newLink = NULL;
 		//navigate through list
-		for (i = 0; i < idx && current != NULL;i++)
+		for (i = 0; i < idx && current != NULL; i++)
 			current = current->next;
 		if (current == NULL)
 			return 0;
@@ -240,20 +281,22 @@ int insertBefore(list *lst, User data, int idx)
 		current->prev->next = newLink;
 		current->prev = newLink;
 
-		free(newLink);
+		//free(newLink);
 		return 1;
 	}
 	return 0;
 }
 
-void writeToFile (char *path, list *lst) {
+void writeToFile(char *path, list *lst) {
 	Node *current_node = lst->head;
-	FILE *fp = fopen(path, "wb");
+	FILE *fp = fopen(path, "w");
 	char* headers = "Name                 Code     S Start date End date   Stime Etime\r\n";
 
-	fputs(headers, fp);
+	fputs(headers, fp); // Write the headers line to the file
+
+	// Write each node (user) in the linked list to the file
 	while (current_node != NULL) {
-		fprintf(fp, "%-20s %-8s %-1d %-10s %-10s %-5s %-5s\r\n",
+		fprintf(fp, "%-20s %-8s %-1d %-10s %-10s %-5s %-5s\n",
 			current_node->data.name,
 			current_node->data.code,
 			current_node->data.status,
@@ -265,23 +308,90 @@ void writeToFile (char *path, list *lst) {
 	}
 	fclose(fp);
 }
+
+// Write each node (user) in the linked list to the  log file
+void writeToLogFile(char *path, list *lst) {
+	Node *current_node = lst->head;
+	FILE *fp = fopen(path, "wb");
+	char* headers = "Name/Code             door Status                date       time\r\n";
+
+	fputs(headers, fp);
+	/*while (current_node != NULL) {
+		fprintf(fp, "%-20s %-4s %-21d %-10s %-5s\r\n",
+			current_node->rqst_data.name_code,
+			current_node->rqst_data.door,
+			current_node->rqst_data.status,
+			current_node->rqst_data.date,
+			current_node->rqst_data.time);
+		current_node = current_node->next;
+	}*/
+	fclose(fp);
+}
+
 /* Print all the elements in the linked list */
 void print(char *path, list *lst) { //Node *head) {
-	Node *current_node = lst->head;	
-	
-	//printf("\nThe current users list:\n%s", headers); //Print headers' line to the console
-	
+	Node *current_node = lst->head;
+	char* headers;
+
+	if (strcmp(path, "access.txt") == 0) {
+		headers = "Name                 Code     S Start date End date   Stime Etime\n";
+		printf("\nThe current users list:\n%s", headers); //Print headers line to the console
+	}	
+	else if (strcmp(path, "log.txt") == 0) {
+		headers = "Name / Code             door Status                date       time\n";
+		printf("\nThe current users list:\n%s", headers); //Print headers line to the console
+	}
+		
 	while (current_node != NULL) {
-		printf("%-20s %-8s %-1d %-10s %-10s %-5s %-5s\n",
-			current_node->data.name,
-			current_node->data.code,
-			current_node->data.status,
-			current_node->data.date_s,
-			current_node->data.date_e,
-			current_node->data.time_s,
-			current_node->data.time_e);		
+		if (strcmp(path, "access.txt") == 0) {
+			printf("%-20s %-8s %-1d %-10s %-10s %-5s %-5s\n",                                                 
+				current_node->data.name,
+				current_node->data.code,
+				current_node->data.status,
+				current_node->data.date_s,
+				current_node->data.date_e,
+				current_node->data.time_s,
+				current_node->data.time_e);
+		}
+		else if (strcmp(path, "requests.txt") == 0) 
+			printf("%-1d,%-8s\n", current_node->rqst_data.door, current_node->rqst_data.name_code);
+
+		else if (strcmp(path, "log.txt") == 0) {
+			printf("%-20s %-4s %-21d %-10s %-5s\n",
+				current_node->rqst_data.name_code,
+				current_node->rqst_data.door,
+				current_node->rqst_data.status,
+				current_node->rqst_data.date,
+				current_node->rqst_data.time);
+		}
 		current_node = current_node->next;
 	}
+}
+
+void readRequsts(char *path, list *lst) {
+	FILE *fp1;
+	char temp[12], code[21];
+	int door;
+	Request r;
+
+	fp1 = fopen(path, "rb"); //Reads all the data from the file and put it in fp
+	if (!fp1)
+	{
+		printf("File not found!\n");
+		return;
+	}
+
+	//fgets(temp, 12, fp);
+
+	while (fscanf(fp1, "%1d,%20s", &door, code) != EOF) {
+		strcpy(r.name_code, code);
+		r.door = door;
+
+		insertLastLog(lst, r);
+	}
+
+	fclose(fp1);
+	//return lst;
 }
 
 void readAccess(char *path, list *lst) // Node *head) // 
@@ -296,7 +406,7 @@ void readAccess(char *path, list *lst) // Node *head) //
 
 	User d;
 
-	fp = fopen(path, "rb"); //Reads all the data from the file and put it in fp
+	fp = fopen(path, "r"); //Reads all the data from the file and put it in fp
 	if (!fp)
 	{
 		printf("File not found!\n");
@@ -320,7 +430,6 @@ void readAccess(char *path, list *lst) // Node *head) //
 	}
 	//print(lst);
 	fclose(fp);
-	return lst;
 }
 
 void AddUser(list *new)
@@ -361,21 +470,25 @@ void AddUser(list *new)
 	free(newuser);
 }
 
-list *search(char *path, list *lst, char *name, int status, char *code) {
+list *search(list *lst, char *name, int status, char *code) {
 	Node *current_node = lst->head;
 	list *rslt_list = (list *)malloc(sizeof(list));
 	init_list(rslt_list);
-
+	int check = 0;
 	if (isEmpty(lst)) {
 		return;
 	}
 
 	while (current_node != NULL) {
-		if (strcmp(current_node->data.name,name) == 0 || current_node->data.status == status || strcmp(current_node->data.code, code) == 0)
+		if (strcmp(current_node->data.name, name) == 0 || current_node->data.status == status || strcmp(current_node->data.code, code) == 0) {
 			insertLast(rslt_list, current_node->data);
+			check ++;
+		}
+		
 		current_node = current_node->next;
 	}
-	
+	if (check == 0)
+		return rslt_list = NULL;
 	return rslt_list;
 }
 
@@ -388,17 +501,24 @@ void updateUser(char *path, list *lst, char *name, int status, char *code) {
 	init_list(rslt_list);
 
 	// search the user to update by its NAME
-	if (strcmp(name,"") != 0) {
-		rslt_list = search(path, lst, name, 0, "");
+	if (strcmp(name, "") != 0) {
+		rslt_list = search(lst, name, 0, "");
 		updt_node = rslt_list->head;
 
 		// update user's TIME-RANGE permissions
 		if (status == 0) {
 			printf("Enter new START and END date, START and END time (dd/mm/yyyy hh:mm) for user %s: ", name);
 			scanf("%s %s %s %s", updt_node->data.date_s, updt_node->data.date_e, updt_node->data.time_s, updt_node->data.time_e);
-			printf("%s %s %s %s", updt_node->data.date_s, updt_node->data.date_e, updt_node->data.time_s, updt_node->data.time_e);
+			printf("User details after the changes:\n%-20s %-8s %-1d %-10s %-10s %-5s %-5s\n", 
+				updt_node->data.name,
+				updt_node->data.code,
+				updt_node->data.status,
+				updt_node->data.date_s,
+				updt_node->data.date_e,
+				updt_node->data.time_s,
+				updt_node->data.time_e);
 		}
-
+		
 		// update user's permissions STATUS
 		else {
 			updt_node->data.status = status;
@@ -407,14 +527,21 @@ void updateUser(char *path, list *lst, char *name, int status, char *code) {
 
 	// search the user to update by its CODE
 	else {
-		rslt_list = search(path, lst, "", 0, code);
+		rslt_list = search(lst, "", 0, code);
 		updt_node = rslt_list->head;
 
 		// update user's TIME-RANGE permissions
 		if (status == 0) {
 			printf("Enter new START and END date, START and END time (dd/mm/yyyy hh:mm) for user %s: ", name);
 			scanf("%s %s %s %s", updt_node->data.date_s, updt_node->data.date_e, updt_node->data.time_s, updt_node->data.time_e);
-			printf("%s %s %s %s", updt_node->data.date_s, updt_node->data.date_e, updt_node->data.time_s, updt_node->data.time_e);
+			printf("User details after the changes %-20s %-8s %-1d %-10s %-10s %-5s %-5s\n",
+				updt_node->data.name,
+				updt_node->data.code,
+				updt_node->data.status,
+				updt_node->data.date_s,
+				updt_node->data.date_e,
+				updt_node->data.time_s,
+				updt_node->data.time_e);
 		}
 
 		// update user's permissions STATUS
@@ -429,7 +556,7 @@ void updateUser(char *path, list *lst, char *name, int status, char *code) {
 	{
 		if (strcmp(cmpuser->data.code, updt_node->data.code) == 0) {
 			insertBefore(lst, updt_node->data, count);
-			deleteLink(lst, count+1);
+			deleteLink(lst, count + 1);
 			check = 1;
 			break;
 		}
@@ -441,6 +568,84 @@ void updateUser(char *path, list *lst, char *name, int status, char *code) {
 
 	writeToFile(path, lst);
 	free(rslt_list);
+}
+
+void getDateTime(int *day, int *month, int *year, int *hours, int *mins)
+{
+	/***
+	* Handle function: Returns by referfance the current date and time
+	***/
+	time_t rawtime;
+	struct tm *timeinfo;
+
+	time(&rawtime);
+	timeinfo = localtime(&rawtime);
+
+	*day = timeinfo->tm_mday;
+	*month = timeinfo->tm_mon + 1;
+	*year = timeinfo->tm_year + 1900;
+	*hours = timeinfo->tm_hour;
+	*mins = timeinfo->tm_min;
+}
+
+void checkRequest(list *accs_list, list *rqst_list) {
+	list *check = (list*)malloc(sizeof(list));
+	Node *current_rqst = rqst_list->head;
+	//Node *current_check = check->head;
+	//int *day, *month, *year, *hours, *mins;
+	char *status,*name;
+
+	int *day = (int*)malloc(sizeof(int));
+	int *month = (int*)malloc(sizeof(int));
+	int *year = (int*)malloc(sizeof(int)); 
+	int *hours = (int*)malloc(sizeof(int));
+	int *mins = (int*)malloc(sizeof(int));
+
+	getDateTime(day, month, year, hours, mins);
+	printf("%d %d %d %d %d", day, month, year, hours, mins);
+
+	while (current_rqst != NULL) {
+		check = search(accs_list, "", 0, current_rqst->rqst_data.name_code);
+		if (check == NULL) {
+			status = "Unknown user          ";
+			strcpy(current_rqst->rqst_data.status, status);
+			//date time
+		}
+
+		else {
+			strcpy(current_rqst->rqst_data.name_code, check->head->data.name);
+
+			if (check->head->data.status == 1) {
+				status = "Not Authorised user";
+				strcpy(current_rqst->rqst_data.status, status);
+				//date time
+			}
+
+			else if (check->head->data.status == 5) {
+				status = "Entry available";
+				strcpy(current_rqst->rqst_data.status, status);
+				//date time
+			}
+
+			else if (check->head->data.status == 4) {
+				//date time
+			}
+
+			else if (check->head->data.status == current_rqst->rqst_data.door+1) {
+				//date time
+			}
+			else {
+				status = "Not Authorised - Door";
+				strcpy(current_rqst->rqst_data.status, status);
+				//date time
+			}
+		}
+
+
+		current_rqst = current_rqst->next;
+	}
+	
+
 }
 
 int countLines(FILE *fp)
