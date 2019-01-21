@@ -19,8 +19,8 @@ typedef struct user_data
 typedef struct user_request
 {
 	char name_code[21];
-	char date[11];
-	char time[5];
+	//char date[11];
+	//char time[5];
 	char status[22];
 	int door;
 }Request;
@@ -310,21 +310,21 @@ void writeToFile(char *path, list *lst) {
 }
 
 // Write each node (user) in the linked list to the  log file
-void writeToLogFile(char *path, list *lst) {
+void writeToLogFile(char *path, list *lst, char date, char time) {
 	Node *current_node = lst->head;
-	FILE *fp = fopen(path, "wb");
+	FILE *fp = fopen(path, "a");
 	char* headers = "Name/Code             door Status                date       time\r\n";
 
 	fputs(headers, fp);
-	/*while (current_node != NULL) {
-		fprintf(fp, "%-20s %-4s %-21d %-10s %-5s\r\n",
+	while (current_node != NULL) {
+		fprintf(fp, "%-20s %-4s %-21d %d/%d/%d  %d:%d\n",
 			current_node->rqst_data.name_code,
 			current_node->rqst_data.door,
 			current_node->rqst_data.status,
-			current_node->rqst_data.date,
-			current_node->rqst_data.time);
+			date, time
+		);
 		current_node = current_node->next;
-	}*/
+	}
 	fclose(fp);
 }
 
@@ -360,9 +360,9 @@ void print(char *path, list *lst) { //Node *head) {
 			printf("%-20s %-4s %-21d %-10s %-5s\n",
 				current_node->rqst_data.name_code,
 				current_node->rqst_data.door,
-				current_node->rqst_data.status,
-				current_node->rqst_data.date,
-				current_node->rqst_data.time);
+				current_node->rqst_data.status);
+				//current_node->rqst_data.date,
+				//current_node->rqst_data.time);
 		}
 		current_node = current_node->next;
 	}
@@ -570,39 +570,67 @@ void updateUser(char *path, list *lst, char *name, int status, char *code) {
 	free(rslt_list);
 }
 
-void getDateTime(int *day, int *month, int *year, int *hours, int *mins)
+void getDateTime(char *day, char *month, int *year, int *hours, int *mins)
 {
 	/***
 	* Handle function: Returns by referfance the current date and time
 	***/
 	time_t rawtime;
 	struct tm *timeinfo;
+	int day_n, month_n;
 
 	time(&rawtime);
 	timeinfo = localtime(&rawtime);
 
-	*day = timeinfo->tm_mday;
-	*month = timeinfo->tm_mon + 1;
+	day_n = timeinfo->tm_mday;
+	month_n = timeinfo->tm_mon + 1;
 	*year = timeinfo->tm_year + 1900;
 	*hours = timeinfo->tm_hour;
 	*mins = timeinfo->tm_min;
+
+	if (day_n < 10) {
+		sprintf(day, "0%d", day_n);
+	}
+	if (month_n < 10) {
+		sprintf(month, "0%d", month_n);
+	}
 }
 
-void checkRequest(list *accs_list, list *rqst_list) {
-	list *check = (list*)malloc(sizeof(list));
+
+char *isInRange(list *check, char *date, char *time) {
+	char *status;
+	char date1[8];
+	char rqst_date_s[10];
+	char date_s_day[10];
+	int check1 = strcmp(check->head->data.date_s, date);
+
+	strcpy(rqst_date_s, check->head->data.date_s);
+	strcat(rqst_date_s, strncpy(date_s_day, rqst_date_s+6, 4));
+
+	
+	if (strcmp(check->head->data.date_e, date) > 0 && strcmp(check->head->data.date_s, date) < 0) {
+		if (strcmp(check->head->data.time_e, time) > 0 && strcmp(check->head->data.time_s, time) < 0) {
+			status = "Entry available";
+		}
+		else
+			status = "Not Authorised - Time";
+	}
+	else {
+		status = "Not Authorised - Date";
+	}
+	return status;
+}
+void checkRequest(list *accs_list, list *rqst_list, char *day, char *month, int *year, int *hours, int *mins) {
+	list *check = (list*)malloc(sizeof(list));	
 	Node *current_rqst = rqst_list->head;
 	//Node *current_check = check->head;
-	//int *day, *month, *year, *hours, *mins;
-	char *status,*name;
+	//int day, month, year, hours, mins;
+	char *status, *name, date[10],time[5];
 
-	int *day = (int*)malloc(sizeof(int));
-	int *month = (int*)malloc(sizeof(int));
-	int *year = (int*)malloc(sizeof(int)); 
-	int *hours = (int*)malloc(sizeof(int));
-	int *mins = (int*)malloc(sizeof(int));
-
-	getDateTime(day, month, year, hours, mins);
-	printf("%d %d %d %d %d", day, month, year, hours, mins);
+	sprintf(date, "%4d/%2s/%2s", year, month, day);
+	sprintf(time, "%2d:%2d", hours, mins);
+	//getDateTime(&day, &month, &year, &hours, &mins);
+	printf("%d/%d/%d %d:%d", day, month, year, hours, mins);
 
 	while (current_rqst != NULL) {
 		check = search(accs_list, "", 0, current_rqst->rqst_data.name_code);
@@ -617,34 +645,33 @@ void checkRequest(list *accs_list, list *rqst_list) {
 
 			if (check->head->data.status == 1) {
 				status = "Not Authorised user";
-				strcpy(current_rqst->rqst_data.status, status);
-				//date time
+				strcpy(current_rqst->rqst_data.status, status);	
 			}
-
 			else if (check->head->data.status == 5) {
 				status = "Entry available";
 				strcpy(current_rqst->rqst_data.status, status);
-				//date time
 			}
 
 			else if (check->head->data.status == 4) {
-				//date time
+				status = isInRange(check, date, time);
+				strcpy(current_rqst->rqst_data.status, status);
 			}
 
 			else if (check->head->data.status == current_rqst->rqst_data.door+1) {
-				//date time
+				status = isInRange(check, date, time);
+				strcpy(current_rqst->rqst_data.status, status);
 			}
 			else {
 				status = "Not Authorised - Door";
 				strcpy(current_rqst->rqst_data.status, status);
-				//date time
 			}
 		}
 
 
 		current_rqst = current_rqst->next;
 	}
-	
+	sprintf(date, "%2d/%2d/%4d", day, month, year);
+	writeToLogFile("log.txt", rqst_list, date, time);
 
 }
 

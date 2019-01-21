@@ -18,7 +18,17 @@
 * When you submit the program make sure this path match to: "log.txt"
 ***/
 
+
+void cmpdate() {
+	char date1[10] = "2001/10/31";
+	char date2[10] = "2002/10/29";
+	int check = strcmp(date1, date2);
+//	print("%d", check);
+}
+
 void main() {
+	//cmpdate();
+
 	list *accs_lst = (list *)malloc(sizeof(list));
 	list *srch_list = (list*)malloc(sizeof(list));
 	list *log_lst = (list*)malloc(sizeof(list));
@@ -26,8 +36,12 @@ void main() {
 	int option, action, srch_status;
 	// *temp;
 	char *updt_name = (char*)malloc(sizeof(char));
-	char srch_name[21], srch_code[9];
+	char srch_name[21], srch_code[9], month[4], day[2];
+	int year, hours, mins;
 
+	
+	getDateTime(&day, month, &year, &hours, &mins);
+	
 	init_list(accs_lst);
 	init_list(srch_list);
 	init_list(log_lst);
@@ -36,9 +50,9 @@ void main() {
 	//print(ACCESS_PATH, accs_lst);
 	readRequsts(REAQUESTS_PATH, rqst_lst);
 	//print(REAQUESTS_PATH, rqst_lst);
-	writeToLogFile(LOG_PATH, log_lst);
-
-	checkRequest(accs_lst, rqst_lst);
+	checkRequest(accs_lst, rqst_lst, day, month, year, hours, mins);
+	
+	//writeToLogFile(LOG_PATH, rqst_lst, day, month, year, hours, mins);
 	/* Display Menu */
 	while (1) {
 		// Operations menu
@@ -59,7 +73,7 @@ void main() {
 			printf(" *Error: Invalid input. Try again.\n");
 			scanf("%s", &temp); //clear input buffer
 			continue;
-		}*/
+		} */
 		scanf("%d", &option);
 		switch (option) {
 
@@ -194,4 +208,5 @@ void main() {
 	return(0);
 
 	system("pause");
+
 }
