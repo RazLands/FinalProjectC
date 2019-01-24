@@ -1,74 +1,67 @@
 #include <stdio.h>
 #include <time.h>
+#include <locale.h>
 #include "functions.h"
 
 #define ACCESS_PATH "access.txt"
 /***
 * This is the path where the access file is located.
-* When you submit the program make sure this path match to: "c:\\temp\\access.txt"
+* When you submit the program make sure this path match to: "access.txt"
 ***/
-
+#define REAQUESTS_PATH "requests.txt"
+/***
+* This is the path where the requests file is located.
+* When you submit the program make sure this path match to: "requests.txt"
+***/
 #define LOG_PATH "log.txt"
 /***
 * This is the path where the log file is located.
-* Open this file and append new records into it.
-* When you submit the program make sure this path match to: "c:\\temp\\log.txt"
+* When you submit the program make sure this path match to: "log.txt"
 ***/
 
-void getDateTime(int *day, int *month, int *year, int *hours, int *mins)
-{
-	/***
-	* Handle function: Returns by referfance the current date and time
-	***/
-	time_t rawtime;
-	struct tm *timeinfo;
-
-	time(&rawtime);
-	timeinfo = localtime(&rawtime);
-
-	*day = timeinfo->tm_mday;
-	*month = timeinfo->tm_mon + 1;
-	*year = timeinfo->tm_year + 1900;
-	*hours = timeinfo->tm_hour;
-	*mins = timeinfo->tm_min;
-}
-
 void main() {
-	list *lst = (list *)malloc(sizeof(list));
-	list *srch_list = (list *)malloc(sizeof(list));
+	list *accs_lst = (list *)malloc(sizeof(list));
+	list *srch_list = (list*)malloc(sizeof(list));
+	list *rqst_lst = (list*)malloc(sizeof(list));
 	int option, action, srch_status;
-	char *temp;
 	char *updt_name = (char*)malloc(sizeof(char));
-	char srch_name[21], srch_code[9];
+	char srch_name[21], srch_code[9], year[5], month[3], day[3], hours[3], mins[3];
 
-	init_list(lst);
+	getDateTime(day, month, year, hours, mins);
+
+	init_list(accs_lst);
 	init_list(srch_list);
-	readAccess(ACCESS_PATH, lst);
+	init_list(rqst_lst);
+	readAccess(ACCESS_PATH, accs_lst);
+	readRequsts(REAQUESTS_PATH, rqst_lst);
+	checkRequest(accs_lst, rqst_lst, day, month, year, hours, mins);
 
+	//writeToLogFile(LOG_PATH, rqst_lst, day, month, year, hours, mins);
 	/* Display Menu */
 	while (1) {
 		// Operations menu
 		{
-			printf("\n *************\n");
-			printf("\n *  Linked list operations:        *\n");
-			printf("\n *  1. SEARCH USER/STATUS   *\n");
-			printf("\n *  2. ADD NEW USER    *\n");
-			printf("\n *  3. UPDATE USER'S PERMISSIONS     *\n");
-			printf("\n *  4.     *\n");
-			printf("\n *  5.            *\n");
-			printf("\n *  6. Quit                        *\n");
-			printf("\n *************\n");
-			printf("\n Choose an option [1-5]. Exit [6]: ");
+			printf("\n *  *  *  *  *  *  *  *  *  *  *  *  *\n");
+			printf("\n *  Operations menu                  *\n");
+			printf("\n *  1. Search for user               *\n");
+			printf("\n *  2. Add new user                  *\n");
+			printf("\n *  3. Update user permissions       *\n");
+			printf("\n *  4. Print log file                *\n");
+			printf("\n *  5. Print user list (acsess.txt)  *\n");
+			printf("\n *  6. Quit                          *\n");
+			printf("\n *  *  *  *  *  *  *  *  *  *  *  *  *\n");
+			printf("\n Please select your action [1-5]. Exit [6]:");
 		}
-		if (scanf("%d", &option) != 1) {
+		/*if (scanf("%d", &option) != 1) {
 			printf(" *Error: Invalid input. Try again.\n");
 			scanf("%s", &temp); //clear input buffer
 			continue;
-		}
+		} */
+		scanf("%d", &option);
 		switch (option) {
-		
-		// Search for user by its name(s) (1) or ststus (2) or code (3)
-		case 1:  {      
+
+			// Search for user by its name(s) (1) or ststus (2) or code (3)
+		case 1: {
 			printf("Choose searching by user NAME (1) or STATUS (2) or CODE (3): ");
 			scanf("%d", &action);
 
@@ -76,7 +69,7 @@ void main() {
 			if (action == 1) {
 				printf("Enter the NAME you want to search for: ");
 				scanf("%20s", srch_name);
-				srch_list = search(ACCESS_PATH, lst, srch_name, 0, "");
+				srch_list = search(accs_lst, srch_name, 0, "");
 				print(ACCESS_PATH, srch_list);
 			}
 
@@ -84,7 +77,7 @@ void main() {
 			else if (action == 2) {
 				printf("Enter the STATUS you want to search for: ");
 				scanf("%d", &srch_status);
-				srch_list = search(ACCESS_PATH, lst, "", srch_status, "");
+				srch_list = search(accs_lst, "", srch_status, "");
 				print(ACCESS_PATH, srch_list);
 			}
 
@@ -92,28 +85,29 @@ void main() {
 			else if (action == 3) {
 				printf("Enter the CODE you want to search for: ");
 				scanf("%8s", &srch_code);
-				srch_list = search(ACCESS_PATH, lst, "", 0, srch_code);
+				srch_list = search(accs_lst, "", 0, srch_code);
 				print(ACCESS_PATH, srch_list);
 			}
 			break;
 		}
-		
-		// add new user
-		case 2: {   
-			AddUser(lst);
-			writeToFile(ACCESS_PATH, lst);
-			print(ACCESS_PATH, lst);
+
+				// add new user
+		case 2: {
+			AddUser(accs_lst);
+			writeToFile(ACCESS_PATH, accs_lst);
+			print(ACCESS_PATH, accs_lst);
+
 			break;
 		}
 
-		// Update user's permissions
+				// Update user's permissions
 		case 3: {
 			printf("Type '1' (name) or '2' (code) to choose which user to update. Type '3' to see current users list: ");
 			scanf("%d", &action);
 
 			// Print the current users list to the console
 			if (action == 3) {
-				print(ACCESS_PATH, lst);
+				print(ACCESS_PATH, accs_lst);
 				//getch();
 				printf("Type '1' (name) or '2' (code) to choose which user to update: ");
 				scanf("%d", &action);
@@ -124,19 +118,19 @@ void main() {
 				printf("Enter a user NAME to update: ");
 				scanf("%s", srch_name);
 
-				printf("Choose which paramet to update: STATUS (1), TIME RANGE (2): ");
+				printf("Choose which parameters to update: STATUS (1), TIME RANGE (2): ");
 				scanf("%d", &option);
 
 				// Find user by its NAME and update his permissions status 
 				if (option == 1) {
 					printf("Enter the new status permission for user %s: ", srch_name);
 					scanf("%d", &srch_status);
-					updateUser(ACCESS_PATH, lst, srch_name, srch_status, "");
+					updateUser(ACCESS_PATH, accs_lst, srch_name, srch_status, "");
 				}
 
 				// Find user by its NAME and update user's date and time range permission
 				if (option == 2) {
-					updateUser(ACCESS_PATH, lst, srch_name, 0, "");
+					updateUser(ACCESS_PATH, accs_lst, srch_name, 0, "");
 				}
 			}
 
@@ -144,65 +138,54 @@ void main() {
 			else if (action == 2) {
 				printf("Enter a user CODE to update: ");
 				scanf("%s", srch_code);
-				printf("Choose which paramet to update: STATUS (1), TIME RANGE (2): ");
+				printf("Choose which parameters to update: STATUS (1), TIME RANGE (2): ");
 				scanf("%d", &option);
 
 				// Find user by its NAME and update his permissions status 
 				if (option == 1) {
 					printf("Enter the new status permission for user code %s: ", srch_code);
 					scanf("%d", &srch_status);
-					updateUser(ACCESS_PATH, lst, "", srch_status, srch_code);
+					updateUser(ACCESS_PATH, accs_lst, "", srch_status, srch_code);
 				}
 				// Find user by its NAME and update user's date and time range permission
 				if (option == 2) {
-					updateUser(ACCESS_PATH, lst, "", 0, srch_code);
+					updateUser(ACCESS_PATH, accs_lst, "", 0, srch_code);
 				}
 			}
 
 			break;
 		}
 
-/*		case 4:    // Insert Before
-			printf(" Enter a number to insert : ");
-			if (scanf("%d", &num) != 1) {
-				printf(" *Error: Invalid input. \n");
-				scanf("%s", &temp);
-				continue;
-			}
-			printf(" Before which number do you want to insert : ");
-			if (scanf("%d", &prev_num) != 1) {
-				printf(" *Error: Invalid input.\n");
-				scanf("%s", &temp);
-				continue;
-			}
-			if (head != NULL) {
-				head = insert_before(num, prev_num, head);
-				printf("Number %d inserted before %d", num, prev_num);
-			}
-			else {
-				printf("The list is empty", num, prev_num);
-			}
-			printf("\nPress any key to continue...");
-			getch();
+				// Print log file to the console
+		case 4: {
+			print(LOG_PATH, rqst_lst);
 			break;
-		case 5: // Show all elements
-			printf("\nElements in the list: \n [ ");
-			print(head);
-			printf("]\n\nPress any key to continue...");
-			getch();
-			break;*/
-		case 6:  // Exit
-			free(lst);
-			free(srch_list);
-			free(updt_name);
+		}
+
+				// Print access file to the console
+		case 5: {
+			print(ACCESS_PATH, accs_lst);
+			break;
+		}
+
+				// Exit program
+		case 6: {
+			//free(accs_lst);
+			//free(srch_list);
+			//free(rqst_lst);
+			//free(updt_name);
 			return(0);
 			break;
-		default:
+		}
+
+		default: {
 			printf("Invalid Option. Please Try again.");
 			getch();
 		} // End of Switch
-	} // End of While
-	return(0);
+		} // End of While
+		//return(0);
 
-	//system("pause");
+		//system("pause");
+
+	}
 }
