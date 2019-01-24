@@ -36,6 +36,8 @@ void main() {
 	readRequsts(REAQUESTS_PATH, rqst_lst);
 	checkRequest(accs_lst, rqst_lst, day, month, year, hours, mins);
 
+	print(ACCESS_PATH, accs_lst);
+
 	//writeToLogFile(LOG_PATH, rqst_lst, day, month, year, hours, mins);
 	/* Display Menu */
 	while (1) {
@@ -117,25 +119,33 @@ void main() {
 			if (action == 1) {
 				printf("Enter a user NAME to update: ");
 				scanf("%s", srch_name);
+				srch_list = search(accs_lst, srch_name, 0, "");
 
-				printf("Choose which parameters to update: STATUS (1), TIME RANGE (2): ");
-				scanf("%d", &option);
+				if (length(srch_list) < 2) {
+					printf("Choose which parameters to update: STATUS (1), TIME RANGE (2): ");
+					scanf("%d", &option);
 
-				// Find user by its NAME and update his permissions status 
-				if (option == 1) {
-					printf("Enter the new status permission for user %s: ", srch_name);
-					scanf("%d", &srch_status);
-					updateUser(ACCESS_PATH, accs_lst, srch_name, srch_status, "");
+					// Find user by its NAME and update his permissions status 
+					if (option == 1) {
+						printf("Enter the new status permission for user %s: ", srch_name);
+						scanf("%d", &srch_status);
+						updateUser(ACCESS_PATH, accs_lst, srch_list, srch_name, srch_status, "");
+					}
+
+					// Find user by its NAME and update user's date and time range permission
+					if (option == 2) {
+						updateUser(ACCESS_PATH, accs_lst, srch_list, srch_name, 0, "");
+					}
 				}
 
-				// Find user by its NAME and update user's date and time range permission
-				if (option == 2) {
-					updateUser(ACCESS_PATH, accs_lst, srch_name, 0, "");
+				else {
+					printf("There are more then one users with name: %s\n", srch_name);
+					action = 2;
 				}
 			}
 
 			// Update user by its user CODE
-			else if (action == 2) {
+			if (action == 2) {
 				printf("Enter a user CODE to update: ");
 				scanf("%s", srch_code);
 				printf("Choose which parameters to update: STATUS (1), TIME RANGE (2): ");
@@ -145,11 +155,11 @@ void main() {
 				if (option == 1) {
 					printf("Enter the new status permission for user code %s: ", srch_code);
 					scanf("%d", &srch_status);
-					updateUser(ACCESS_PATH, accs_lst, "", srch_status, srch_code);
+					updateUser(ACCESS_PATH, accs_lst, srch_list, "", srch_status, srch_code);
 				}
 				// Find user by its NAME and update user's date and time range permission
 				if (option == 2) {
-					updateUser(ACCESS_PATH, accs_lst, "", 0, srch_code);
+					updateUser(ACCESS_PATH, accs_lst, srch_list, "", 0, srch_code);
 				}
 			}
 
@@ -170,10 +180,10 @@ void main() {
 
 				// Exit program
 		case 6: {
-			//free(accs_lst);
-			//free(srch_list);
-			//free(rqst_lst);
-			//free(updt_name);
+			free(accs_lst);
+			free(srch_list);
+			free(rqst_lst);
+			free(updt_name);
 			return(0);
 			break;
 		}
@@ -181,11 +191,7 @@ void main() {
 		default: {
 			printf("Invalid Option. Please Try again.");
 			getch();
-		} // End of Switch
-		} // End of While
-		//return(0);
-
-		//system("pause");
-
-	}
+		}
+		}  // End of Switch
+	} // End of While
 }
