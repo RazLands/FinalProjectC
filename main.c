@@ -26,6 +26,7 @@ void main() {
 	int option, action, srch_status;
 	char *updt_name = (char*)malloc(sizeof(char));
 	char srch_name[21], srch_code[9], year[5], month[3], day[3], hours[3], mins[3];
+	char *temp;
 
 	getDateTime(day, month, year, hours, mins);
 
@@ -54,15 +55,17 @@ void main() {
 			printf("\n *  *  *  *  *  *  *  *  *  *  *  *  *\n");
 			printf("\n Please select your action [1-5]. Exit [6]:");
 		}
-		/*if (scanf("%d", &option) != 1) {
-			printf(" *Error: Invalid input. Try again.\n");
+		
+		// Check for invalid input (not number)
+		if (scanf("%d", &option) != 1) {
+			printf(" \n*Error: Invalid input. Try again.\n");
 			scanf("%s", &temp); //clear input buffer
 			continue;
-		} */
-		scanf("%d", &option);
+		} 
+		
 		switch (option) {
 
-		// Search for user by its name(s) (1) or ststus (2) or code (3) or main menu (0)
+		// Search for user by its name(s) (1) or status (2) or code (3) or main menu (0)
 		case 1: {
 			printf("Choose searching by user NAME (1) or STATUS (2) or CODE (3). MAIN MENU (0): ");
 			scanf("%d", &action);
@@ -104,11 +107,11 @@ void main() {
 			}
 			
 			// Check if any result has been found
-			if (srch_list != NULL) {
+			if (srch_list != NULL && action != 0) {
 				print(ACCESS_PATH, srch_list);
 			}
 			// No result found
-			else {
+			else if (action != 0) {
 				printf("ERROR: User not found! Please Try again\n");
 				printf("Choose searching by user NAME (1) or STATUS (2) or CODE (3). MAIN MENU (0): ");
 				scanf("%d", &action);
@@ -160,7 +163,7 @@ void main() {
 			}
 
 			// Print the current users list to the console
-			if (action == 3) {
+			else if (action == 3) {
 				print(ACCESS_PATH, accs_lst);
 				printf("Type '1' (name) or '2' (code) to choose which user to update. MAIN MENU (0): ");
 				scanf("%d", &action);
@@ -339,16 +342,15 @@ void main() {
 				}
 			}*/
 
+			// Check entrance requests after updating user's permissions
+			init_list(rqst_lst);
+			readRequsts(REAQUESTS_PATH, rqst_lst);
+			checkRequest(accs_lst, rqst_lst, day, month, year, hours, mins);
 			break;
 		}
 
 		// Print log file to the console
 		case 4: {
-			init_list(accs_lst);
-			init_list(rqst_lst);
-			readAccess(ACCESS_PATH, accs_lst);
-			readRequsts(REAQUESTS_PATH, rqst_lst);
-			checkRequest(accs_lst, rqst_lst, day, month, year, hours, mins);
 			print(LOG_PATH, rqst_lst);
 			break;
 		}
