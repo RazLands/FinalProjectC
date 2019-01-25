@@ -62,17 +62,64 @@ void main() {
 		scanf("%d", &option);
 		switch (option) {
 
-			// Search for user by its name(s) (1) or ststus (2) or code (3)
+		// Search for user by its name(s) (1) or ststus (2) or code (3) or main menu (0)
 		case 1: {
-			printf("Choose searching by user NAME (1) or STATUS (2) or CODE (3): ");
+			printf("Choose searching by user NAME (1) or STATUS (2) or CODE (3). MAIN MENU (0): ");
 			scanf("%d", &action);
 
+			// Invalid action input
+			if (action > 3) {
+				printf("ERROR: Invalid action.\n Please choose searching by user NAME (1) or STATUS (2) or CODE (3). MAIN MENU (0): ");
+				scanf("%d", &action);
+			}
+
+			// Check for chosen action: Search a user by user NAME/STATUS/CODE or go back to main menu
+			switch (action)
+			{
+				// Go back to main menu
+				case 0: {
+					break;
+				}
+				// Search a user by user NAME
+				case 1: {
+					printf("Enter the NAME you want to search for: ");
+					scanf("%20s", srch_name);
+					srch_list = search(accs_lst, srch_name, 0, "");
+					break;
+				}
+				// Search a user by user STATUS
+				case 2: {
+					printf("Enter the STATUS [1-5] you want to search for: ");
+					scanf("%d", &srch_status);
+					srch_list = search(accs_lst, "", srch_status, "");
+					break;
+				}
+				// Search a user by user CODE
+				case 3: {
+					printf("Enter the CODE you want to search for: ");
+					scanf("%8s", &srch_code);
+					srch_list = search(accs_lst, "", 0, srch_code);
+					break;
+				}	
+			}
+			
+			// Check if any result has been found
+			if (srch_list != NULL) {
+				print(ACCESS_PATH, srch_list);
+			}
+			// No result found
+			else {
+				printf("ERROR: User not found! Please Try again\n");
+				printf("Choose searching by user NAME (1) or STATUS (2) or CODE (3). MAIN MENU (0): ");
+				scanf("%d", &action);
+			}
+
+			break;
 			// Search a user by user NAME
-			if (action == 1) {
+			/*if (action == 1) {
 				printf("Enter the NAME you want to search for: ");
 				scanf("%20s", srch_name);
 				srch_list = search(accs_lst, srch_name, 0, "");
-				print(ACCESS_PATH, srch_list);
 			}
 
 			// Search a user by user STATUS
@@ -80,7 +127,7 @@ void main() {
 				printf("Enter the STATUS you want to search for: ");
 				scanf("%d", &srch_status);
 				srch_list = search(accs_lst, "", srch_status, "");
-				print(ACCESS_PATH, srch_list);
+				//print(ACCESS_PATH, srch_list);
 			}
 
 			// Search a user by user CODE
@@ -88,12 +135,11 @@ void main() {
 				printf("Enter the CODE you want to search for: ");
 				scanf("%8s", &srch_code);
 				srch_list = search(accs_lst, "", 0, srch_code);
-				print(ACCESS_PATH, srch_list);
-			}
-			break;
+				//print(ACCESS_PATH, srch_list);
+			}*/	
 		}
 
-				// add new user
+		// add new user
 		case 2: {
 			AddUser(accs_lst);
 			writeToFile(ACCESS_PATH, accs_lst);
@@ -102,19 +148,116 @@ void main() {
 			break;
 		}
 
-				// Update user's permissions
+		// Update user's permissions
 		case 3: {
-			printf("Type '1' (name) or '2' (code) to choose which user to update. Type '3' to see current users list: ");
+			printf("Type '1' (name) or '2' (code) to choose which user to update, '3' for users list. MAIN MENU (0): ");
 			scanf("%d", &action);
+
+			// Invalid action input
+			if (action > 3) {
+				printf("ERROR: Invalid action.\n Type '1' (name) or '2' (code) to choose which user to update, '3' for users list. MAIN MENU (0): ");
+				scanf("%d", &action);
+			}
 
 			// Print the current users list to the console
 			if (action == 3) {
 				print(ACCESS_PATH, accs_lst);
-				//getch();
-				printf("Type '1' (name) or '2' (code) to choose which user to update: ");
+				printf("Type '1' (name) or '2' (code) to choose which user to update. MAIN MENU (0): ");
 				scanf("%d", &action);
 			}
 
+			// Check for chosen action: Update user by its user NAME / CODE or go back to main menu
+			switch (action)
+			{
+				// Go back to main menu
+				case 0: {
+					break;
+				}
+				// Update user by its user NAME
+				case 1: {
+					printf("Enter a user NAME to update: ");
+					scanf("%s", srch_name);
+					srch_list = search(accs_lst, srch_name, 0, "");
+
+					// Check that there is only one user by a given user NAME
+					if (length(srch_list) < 2) {
+						printf("Choose which parameters to update: STATUS (1), TIME RANGE (2), MAIN MENU (0): ");
+						scanf("%d", &option);
+
+						// Invalid action input
+						if (option > 2) {
+							printf("ERROR: Invalid action.\n Please choose again STATUS (1), TIME RANGE (2), MAIN MENU (0): ");
+							scanf("%d", &option);
+						}
+
+						// (NAME) Check for chosen action: Update user's permissions by STATUS/TIME RANGE or go back to main menu
+						switch (option)
+						{
+						// Go back to main menu
+						case 0: {
+							break;
+						}
+						// Update user's STATUS permissions
+						case 1: {
+							printf("Enter the new status permission for user %s: ", srch_name);
+							scanf("%d", &srch_status);
+							updateUser(ACCESS_PATH, accs_lst, srch_list, srch_name, srch_status, "");
+							break;
+						}
+						// Update user's DATE TIME range permission							
+						case 2: {
+							updateUser(ACCESS_PATH, accs_lst, srch_list, srch_name, 0, "");
+							break;
+						}
+						}
+					}
+					// There are multiple users with the same name -> update user by his CODE
+					else {
+						printf("ERROR: There is more then one user named: %s\n", srch_name);
+						action = 2;
+					}
+
+					break;
+				}
+				// Update user by its user CODE
+				case 2: {
+					printf("Enter a user CODE to update: ");
+					scanf("%s", srch_code);
+					printf("Choose which parameters to update: STATUS (1), TIME RANGE (2), back to MAIN MENU (0): ");
+					scanf("%d", &option);
+					srch_list = search(accs_lst, "", 0, srch_code);
+
+					// Invalid action input
+					if (option > 2) {
+						printf("ERROR: Invalid action.\n Please choose again STATUS (1), TIME RANGE (2), back to MAIN MENU (0): ");
+						scanf("%d", &option);
+					}
+
+					// (CODE) Check for chosen action: Update user's permissions by STATUS/TIME RANGE or go back to main menu
+					switch (option)
+					{
+					// Go back to main menu
+					case 0: {
+						break;
+					}
+					// Update user's STATUS permissions
+					case 1: {
+						printf("Enter the new status permission for user code %s: ", srch_code);
+						scanf("%d", &srch_status);
+						updateUser(ACCESS_PATH, accs_lst, srch_list, "", srch_status, srch_code);
+						break;
+					}
+					// Update user's DATE TIME range permission	
+					case 2: {
+						updateUser(ACCESS_PATH, accs_lst, srch_list, "", 0, srch_code);
+						break;
+					}
+					}
+
+					break;			
+				}
+			}
+			/*
 			// Update user by its user NAME
 			if (action == 1) {
 				printf("Enter a user NAME to update: ");
@@ -122,9 +265,35 @@ void main() {
 				srch_list = search(accs_lst, srch_name, 0, "");
 
 				if (length(srch_list) < 2) {
-					printf("Choose which parameters to update: STATUS (1), TIME RANGE (2): ");
+					printf("Choose which parameters to update: STATUS (1), TIME RANGE (2), MAIN MENU (0): ");
 					scanf("%d", &option);
 
+					// Invalid action input
+					if (option != 0 && option != 1 && option != 2) {
+						printf("ERROR: Invalid action.\n Please choose again STATUS (1), TIME RANGE (2), MAIN MENU (0): ");
+						scanf("%d", &option);
+					}
+
+					switch (option)
+					{
+					// Go back to main menu
+					case 0: {
+						break;
+					}
+					// Find user by its NAME and update his permissions status 
+					case 1: {
+						printf("Enter the new status permission for user %s: ", srch_name);
+						scanf("%d", &srch_status);
+						updateUser(ACCESS_PATH, accs_lst, srch_list, srch_name, srch_status, "");
+						break;
+					}
+					// Find user by its NAME and update user's date and time range permission							
+					case 2: {
+						updateUser(ACCESS_PATH, accs_lst, srch_list, srch_name, 0, "");
+						break;
+					}
+					}
+					
 					// Find user by its NAME and update his permissions status 
 					if (option == 1) {
 						printf("Enter the new status permission for user %s: ", srch_name);
@@ -139,7 +308,7 @@ void main() {
 				}
 
 				else {
-					printf("There are more then one users with name: %s\n", srch_name);
+					printf("ERROR: There is more then one user name: %s\n", srch_name);
 					action = 2;
 				}
 			}
@@ -150,6 +319,13 @@ void main() {
 				scanf("%s", srch_code);
 				printf("Choose which parameters to update: STATUS (1), TIME RANGE (2): ");
 				scanf("%d", &option);
+				srch_list = search(accs_lst, "", 0, srch_code);
+
+				// Invalid action input
+				if (option > 2) {
+					printf("ERROR: Invalid action.\n Please choose again STATUS (1), TIME RANGE (2), MAIN MENU (0): ");
+					scanf("%d", &option);
+				}
 
 				// Find user by its NAME and update his permissions status 
 				if (option == 1) {
@@ -161,24 +337,24 @@ void main() {
 				if (option == 2) {
 					updateUser(ACCESS_PATH, accs_lst, srch_list, "", 0, srch_code);
 				}
-			}
+			}*/
 
 			break;
 		}
 
-				// Print log file to the console
+		// Print log file to the console
 		case 4: {
 			print(LOG_PATH, rqst_lst);
 			break;
 		}
 
-				// Print access file to the console
+		// Print access file to the console
 		case 5: {
 			print(ACCESS_PATH, accs_lst);
 			break;
 		}
 
-				// Exit program
+		// Exit program
 		case 6: {
 			free(accs_lst);
 			free(srch_list);
@@ -192,6 +368,6 @@ void main() {
 			printf("Invalid Option. Please Try again.");
 			getch();
 		}
-		}  // End of Switch
+		} // End of Switch
 	} // End of While
 }
