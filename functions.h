@@ -612,6 +612,7 @@ void getDateTime(char *day, char *month, char *year, char *hours, char *mins)
 	}
 }
 
+/* Check if current date is in the range of the user's permissioned dates and times */
 char *isInRange(list *check, char date[10], char time[5]) {
 	char *status;
 	char rqst_date_s[10], rqst_date_e[10];
@@ -619,32 +620,43 @@ char *isInRange(list *check, char date[10], char time[5]) {
 	Node *current_rqst = check->head;
 	struct tm dt_s, dt_e;
 
+	/* Flip date_s format from d/m/y to y/m/d */
+	//Cut the start date and time to smaller segments (day, month, year, hour, minute)
 	strncpy(day, current_rqst->data.date_s, 2);
 	strncpy(month, current_rqst->data.date_s + 3, 2);
 	strncpy(year, current_rqst->data.date_s + 6, 4);
 	strncpy(hour, current_rqst->data.time_s, 2);
 	strncpy(min, current_rqst->data.time_s + 3, 2);
+	// Apply date and time segments to tm structure
 	dt_s.tm_mday = atoi(day);
 	dt_s.tm_mon = atoi(month) - 1;
 	dt_s.tm_year = atoi(year) - 1900;
 	dt_s.tm_hour = atoi(hour);
 	dt_s.tm_min = atoi(min);
+	// Combine segments back to date string
 	strftime(date_s, sizeof(date_s), "%Y/%m/%d", &dt_s);
+	// Combine segments back to time string
 	strftime(time_s, sizeof(time_s), "%R", &dt_s);
 
+	/* Flip date_e format from d/m/y to y/m/d */
+	//Cut the end date and time to smaller segments (day, month, year, hour, minute)
 	strncpy(day, current_rqst->data.date_e, 2);
 	strncpy(month, current_rqst->data.date_e + 3, 2);
 	strncpy(year, current_rqst->data.date_e + 6, 4);
 	strncpy(hour, current_rqst->data.time_e, 2);
 	strncpy(min, current_rqst->data.time_e + 3, 2);
+	// Apply date and time segments to tm structure
 	dt_e.tm_mday = atoi(day);
 	dt_e.tm_mon = atoi(month) - 1;
 	dt_e.tm_year = atoi(year) - 1900;
 	dt_e.tm_hour = atoi(hour);
 	dt_e.tm_min = atoi(min);
+	// Combine segments back to date string
 	strftime(date_e, sizeof(date_e), "%Y/%m/%d", &dt_e);
+	// Combine segments back to time string
 	strftime(time_e, sizeof(time_e), "%R", &dt_e);
 
+	// Check if current date is in the range of the user's permissioned dates
 	if (strcmp(date_e, date) > 0 && strcmp(date_s, date) < 0) {
 		if (strcmp(time_e, time) > 0 && strcmp(time_s, time) < 0) {
 			status = "Entry available";
@@ -659,21 +671,29 @@ char *isInRange(list *check, char date[10], char time[5]) {
 	return status;
 }
 
+/* Check if the entrance is valid due the users permissions */
 void checkRequest(list *accs_list, list *rqst_list, char *day, char *month, char *year, char *hours, char *mins) {
 	list *check = (list*)malloc(sizeof(list));
 	Node *current_rqst = rqst_list->head;
 	char *status, *name, date[11], time[6];
 
+	// Combine day, month, year paramaters into date string format yyyy/mm/dd
 	sprintf(date, "%4s/%2s/%2s", year, month, day);
+	// Combine hours, mins paramaters into time string format HH/MM (24h)
 	sprintf(time, "%s:%s", hours, mins);
 
+	// Go through the entrance request list and check permissions for each requests by user CODE
 	while (current_rqst != NULL) {
+		// Return user's data (as a list Node) from access list according to its CODE from the request list
 		check = search(accs_list, "", 0, current_rqst->rqst_data.name_code);
+		
+		// User CODE in request list not found in access list
 		if (check == NULL) {
 			status = "Unknown user";
 			strcpy(current_rqst->rqst_data.status, status);
 		}
 
+		// User CODE found in access list
 		else {
 			strcpy(current_rqst->rqst_data.name_code, check->head->data.name);
 
@@ -707,25 +727,12 @@ void checkRequest(list *accs_list, list *rqst_list, char *day, char *month, char
 				strcpy(current_rqst->rqst_data.status, status);
 			}
 		}
-
-
 		current_rqst = current_rqst->next;
 	}
+
+	// Combine day, month, year paramaters into date string format dd/mm/yyyy
 	sprintf(date, "%2s/%2s/%4s", day, month, year);
+	// Write the entrace attempts in the log.txt file
 	writeToLogFile("log.txt", rqst_list, date, time);
 
-}
-
-int countLines(FILE *fp)
-{
-	//FILE *f = fopen(filename, "r");
-	int c;
-	int count = 0;
-	if (!fp)
-		return -1;
-	while ((c = fgetc(fp)) != EOF)
-		if (c == '\n')
-			count++;
-	fclose(fp);
-	return count;
 }

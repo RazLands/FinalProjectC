@@ -344,6 +344,11 @@ void main() {
 
 		// Print log file to the console
 		case 4: {
+			init_list(accs_lst);
+			init_list(rqst_lst);
+			readAccess(ACCESS_PATH, accs_lst);
+			readRequsts(REAQUESTS_PATH, rqst_lst);
+			checkRequest(accs_lst, rqst_lst, day, month, year, hours, mins);
 			print(LOG_PATH, rqst_lst);
 			break;
 		}
