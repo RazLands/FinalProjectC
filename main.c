@@ -117,29 +117,7 @@ void main() {
 				scanf("%d", &action);
 			}
 
-			break;
-			// Search a user by user NAME
-			/*if (action == 1) {
-				printf("Enter the NAME you want to search for: ");
-				scanf("%20s", srch_name);
-				srch_list = search(accs_lst, srch_name, 0, "");
-			}
-
-			// Search a user by user STATUS
-			else if (action == 2) {
-				printf("Enter the STATUS you want to search for: ");
-				scanf("%d", &srch_status);
-				srch_list = search(accs_lst, "", srch_status, "");
-				//print(ACCESS_PATH, srch_list);
-			}
-
-			// Search a user by user CODE
-			else if (action == 3) {
-				printf("Enter the CODE you want to search for: ");
-				scanf("%8s", &srch_code);
-				srch_list = search(accs_lst, "", 0, srch_code);
-				//print(ACCESS_PATH, srch_list);
-			}*/	
+			break;	
 		}
 
 		// add new user
