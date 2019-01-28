@@ -37,9 +37,6 @@ void main() {
 	readRequsts(REAQUESTS_PATH, rqst_lst);
 	checkRequest(accs_lst, rqst_lst, day, month, year, hours, mins);
 
-	print(ACCESS_PATH, accs_lst);
-
-	//writeToLogFile(LOG_PATH, rqst_lst, day, month, year, hours, mins);
 	/* Display Menu */
 	while (1) {
 		// Operations menu
@@ -118,28 +115,6 @@ void main() {
 			}
 
 			break;
-			// Search a user by user NAME
-			/*if (action == 1) {
-				printf("Enter the NAME you want to search for: ");
-				scanf("%20s", srch_name);
-				srch_list = search(accs_lst, srch_name, 0, "");
-			}
-
-			// Search a user by user STATUS
-			else if (action == 2) {
-				printf("Enter the STATUS you want to search for: ");
-				scanf("%d", &srch_status);
-				srch_list = search(accs_lst, "", srch_status, "");
-				//print(ACCESS_PATH, srch_list);
-			}
-
-			// Search a user by user CODE
-			else if (action == 3) {
-				printf("Enter the CODE you want to search for: ");
-				scanf("%8s", &srch_code);
-				srch_list = search(accs_lst, "", 0, srch_code);
-				//print(ACCESS_PATH, srch_list);
-			}*/	
 		}
 
 		// add new user
@@ -260,92 +235,12 @@ void main() {
 					break;			
 				}
 			}
-			/*
-			// Update user by its user NAME
-			if (action == 1) {
-				printf("Enter a user NAME to update: ");
-				scanf("%s", srch_name);
-				srch_list = search(accs_lst, srch_name, 0, "");
-
-				if (length(srch_list) < 2) {
-					printf("Choose which parameters to update: STATUS (1), TIME RANGE (2), MAIN MENU (0): ");
-					scanf("%d", &option);
-
-					// Invalid action input
-					if (option != 0 && option != 1 && option != 2) {
-						printf("ERROR: Invalid action.\n Please choose again STATUS (1), TIME RANGE (2), MAIN MENU (0): ");
-						scanf("%d", &option);
-					}
-
-					switch (option)
-					{
-					// Go back to main menu
-					case 0: {
-						break;
-					}
-					// Find user by its NAME and update his permissions status 
-					case 1: {
-						printf("Enter the new status permission for user %s: ", srch_name);
-						scanf("%d", &srch_status);
-						updateUser(ACCESS_PATH, accs_lst, srch_list, srch_name, srch_status, "");
-						break;
-					}
-					// Find user by its NAME and update user's date and time range permission							
-					case 2: {
-						updateUser(ACCESS_PATH, accs_lst, srch_list, srch_name, 0, "");
-						break;
-					}
-					}
-					
-					// Find user by its NAME and update his permissions status 
-					if (option == 1) {
-						printf("Enter the new status permission for user %s: ", srch_name);
-						scanf("%d", &srch_status);
-						updateUser(ACCESS_PATH, accs_lst, srch_list, srch_name, srch_status, "");
-					}
-
-					// Find user by its NAME and update user's date and time range permission
-					if (option == 2) {
-						updateUser(ACCESS_PATH, accs_lst, srch_list, srch_name, 0, "");
-					}
-				}
-
-				else {
-					printf("ERROR: There is more then one user name: %s\n", srch_name);
-					action = 2;
-				}
-			}
-
-			// Update user by its user CODE
-			if (action == 2) {
-				printf("Enter a user CODE to update: ");
-				scanf("%s", srch_code);
-				printf("Choose which parameters to update: STATUS (1), TIME RANGE (2): ");
-				scanf("%d", &option);
-				srch_list = search(accs_lst, "", 0, srch_code);
-
-				// Invalid action input
-				if (option > 2) {
-					printf("ERROR: Invalid action.\n Please choose again STATUS (1), TIME RANGE (2), MAIN MENU (0): ");
-					scanf("%d", &option);
-				}
-
-				// Find user by its NAME and update his permissions status 
-				if (option == 1) {
-					printf("Enter the new status permission for user code %s: ", srch_code);
-					scanf("%d", &srch_status);
-					updateUser(ACCESS_PATH, accs_lst, srch_list, "", srch_status, srch_code);
-				}
-				// Find user by its NAME and update user's date and time range permission
-				if (option == 2) {
-					updateUser(ACCESS_PATH, accs_lst, srch_list, "", 0, srch_code);
-				}
-			}*/
 
 			// Check entrance requests after updating user's permissions
 			init_list(rqst_lst);
 			readRequsts(REAQUESTS_PATH, rqst_lst);
 			checkRequest(accs_lst, rqst_lst, day, month, year, hours, mins);
+			
 			break;
 		}
 
